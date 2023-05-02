@@ -1,0 +1,238 @@
+@font-face {
+  font-family: 'Oxygen';
+  src: url('src/assets/fonts/Oxygen-Light.ttf');
+}
+
+.bgWall {
+  position: relative; 
+}
+
+.bgWall:before {
+  content: ""; 
+  display: block; 
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  top: 0; 
+  left: 0; 
+  background: url('src/pages/styles/register/images/bg.png'); 
+  background-position: left; 
+  background-repeat: no-repeat; 
+  background-size: cover; 
+  opacity: 0.8; 
+  z-index: -1;
+}
+
+
+.containerStyle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .bodyCard {
+    width: 80%;
+    height: 80%;
+  }
+  
+
+  
+  .leftCard {
+    margin: 0;
+    padding: 0;
+    background: url('src/pages/styles/register/images/bg.png');
+    background-position: right center;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+  }
+  
+  .titleArea {
+    height: 110px;
+    display: flex;
+    align-items: end;
+  }
+  
+  .textArea {
+    padding-left: 40px;
+    padding-right: 40px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Oxygen';
+  }
+  
+.linkLogin {
+  text-decoration: none;
+  color: #312e2a;
+  transition: all 0.3s ease;
+}
+
+.linkLogin:hover {
+  color: rgba(49, 46, 42, 0.8);
+  border-bottom: 1px solid rgba(49, 46, 42, 0.8);
+}
+
+  .logo {
+    margin-left: 30px;
+  }
+  
+  
+  .rightCard {
+    margin: 0;
+    padding: 0;
+    background-color: #312e2a;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .formArea {
+    display: flex;
+    justify-content: center;
+;
+  }
+
+
+.buttonArea {
+  width: 50%;
+}
+
+
+.buttonCol {
+  display: flex;
+  justify-content: end;
+}
+
+
+  .loginButton {
+    background-color: #fcc73f;
+    color: #312e2a;
+    font-size: 17px;
+    border-radius: 10px;
+    padding: .450rem 1.5rem;
+    border: none;
+    font-family: 'Oxygen';
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    margin-right: 10%;
+  }
+  
+  .loginButton:hover {
+    background-color: rgba(252,199,63,0.8);
+  }
+  
+  .loginButton:active {
+    background-color: #fcc73f;
+  }
+  
+  .titleRegister {
+    color: #fcc73f;
+    font-size: 40px;
+  }
+  
+  .titleResterArea {
+    height: 100px;
+    display: flex;
+    align-items: center;
+  }
+  
+
+  .errorMessage {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+  
+  .titleInput {
+    color:white;
+    margin: 0;
+  }
+
+.inputArea {
+  margin-bottom: 20px;
+}
+  .inputDefault {
+    width: 95%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    border: 1px solid rgba(252, 199, 63, 0.8);
+    border-radius: .375rem;
+    background-color: rgba(252, 199, 63, 0.8);
+    color: black;
+    height: 50px;
+  }
+  
+  .inputDefault {
+    outline: none;
+  }
+  
+  .iconsArea {
+    text-align: center;
+  }
+  
+  .iconSocial:hover {
+    color: rgba(49, 46, 42, 0.8);
+    font-size: 40px;
+  }
+  
+  .butonArea {
+    width: 91%;
+  }
+  
+  .socialArea {
+    height: 150px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+  }
+  
+  .iconSocial {
+    color: rgba(49, 46, 42, 1);
+    margin: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 30px;
+  }
+
+
+  .checkBox {
+    color: white;
+    cursor: pointer;
+  }
+
+  @media (max-width: 600px) {
+    .leftCard {
+      display: none;
+    }
+
+    .rightCard {
+      border-bottom-left-radius: 10px;
+      border-top-left-radius: 10px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .bodyCard {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+
+  @media (max-width: 576px) {
+    .containerStyle {
+      margin: 0;
+      padding: 0;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .bodyCard {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+
