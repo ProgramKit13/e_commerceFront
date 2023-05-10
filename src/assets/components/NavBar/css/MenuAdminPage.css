@@ -1,3 +1,22 @@
+@font-face {
+  font-family: 'Oxygen';
+  src: url('../../../fonts/Oxygen-Light.ttf');
+}
+
+.body {
+  height: 100vh;
+}
+
+.bodyDashAdminDark {
+  background-color: #181B2E;
+  color: white;
+}
+
+.bodyDashAdminWhite {
+  background-color: #F8F9FC;
+  color: #2C3034;
+}
+
 /*CONTAINER*/
 .styleContainer {
   display: flex;
@@ -23,8 +42,7 @@
     border-bottom-right-radius: 10px;
     height: 70px;
     position: fixed;
-    top: -60px;
-    background-color: #333;
+    top: -70px;
     transition: top 0.4s ease-in-out;
   }
   
@@ -32,14 +50,12 @@
   .navBarSlideArea {
     display: flex;
     justify-content: center;
-    background-color: #171c21;
     height: 100px;   
     width: 90%;
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     position: fixed;
-    top: -60px;
-    background-color: #333;
+    top: -70px;
     transition: top 0.4s ease-in-out;
   }
 
@@ -47,10 +63,25 @@
     top: 0;
 }
 
-.dark {
-  color: white;
-  background: linear-gradient(#394550 0%, #394551), #333D48;
+
+.slideBarDark {
+  background-color: #2C3034;
 }
+
+.slideBarWhite {
+  background-color: #dedede;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+.dark {
+  background-color: #212529;
+}
+
+.white {
+  background-color: white;
+  color: rgb(112, 110, 110);
+}
+
 
 .menuArea {
   height: 100%;
@@ -102,19 +133,8 @@
     width: 40px;
     height: 40px;
     border: none;
-    box-shadow: 2px 1px 20px;
 }
 /*END CONTROLS EXPANDED NAVBAR*/
-
-
-
-
-/*FIRT MENU*/
-.item1 {
-  border-right: 4px solid #333d48;
-}
-
-/*END FIRT MENU*/
 
 
 
@@ -153,7 +173,6 @@
 
 /*THIRD MENU*/
 .item3 {
-  border-left: 4px solid #333d48;
   display: flex;
   justify-content: end;
   align-items: center;
@@ -354,7 +373,7 @@ margin-left: 50px;
     }
   }
 
-@media (max-width: 730px) {
+@media (max-width: 758px) {
     .navBarSlideArea {
       display: none;
     }
@@ -378,7 +397,7 @@ margin-left: 50px;
 }
 
 
-@media (min-width: 730px) {
+@media (min-width: 758px) {
   .circular-menu {
     display: none;
   }
@@ -386,6 +405,20 @@ margin-left: 50px;
 /*END MEDIA QUERIES MIN*/
 
 
+
+/*CONTENT PAGE*/
+.pageContainer {
+width: 100%;
+}
+.downContentPage {
+  transform: translateY(120px); /* Defina a altura da sua navbar aqui */
+  transition: transform 0.4s ease-in-out;
+}
+.upContentPage {
+  transform: translateY(50px);
+  transition: transform 0.4s ease-in-out;
+}
+/*END CONTENT PAGE*/
 
 
 

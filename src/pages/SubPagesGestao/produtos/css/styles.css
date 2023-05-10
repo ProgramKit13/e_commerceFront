@@ -1,0 +1,8 @@
+.groupControlGestaoButtons {
+    display: flex;
+}
+
+.alignCardHeader {
+    display: flex;
+    justify-content: end;
+}

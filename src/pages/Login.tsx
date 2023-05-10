@@ -47,7 +47,7 @@ export const Login = () => {
                 if (response.code >= 200 && response.code < 300) {
                   localStorage.setItem('token', response.data.access_token);
                   localStorage.setItem('refreshToken', response.data.refresh_token);
-                  window.location.href = '/home';
+                  window.location.href = '/axiosadmin';
                 }
                 
                 if (response.code === 401) {

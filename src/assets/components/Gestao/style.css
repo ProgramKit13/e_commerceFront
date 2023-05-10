@@ -1,0 +1,37 @@
+.defaultButtonPageAdmin {
+    border-radius: 5px;
+    width: 110px;
+    padding: 5px;
+    border: none;
+}
+
+.controlGestao {
+    margin-left: 10px;
+}
+
+.controlDark {
+    background-color:#2C3034 ;
+    color: white;
+    transition: all ease 0.3s;
+}
+
+.controlDark:hover {
+    background-color:#51565a ;
+}
+
+.controlDark:active {
+    background-color:#2C3034 ;
+}
+
+
+
+.controlWhite {
+    background-color: #cbcbcb;
+    color: black;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    transition: all ease 0.3s;
+}
+
+.controlWhite:hover {
+    background-color:#adacac ;
+}
