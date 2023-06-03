@@ -1,0 +1,84 @@
+.bodySwitch {
+    position: fixed;
+    margin-right: 25px;
+    position: fixed;
+    top: 150px;
+    right: 0;
+}
+
+.bodySwitch2 {
+    position: fixed;
+    margin-right: 25px;
+    position: fixed;
+    top: 250px;
+    right: 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 80px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #3c2cb3;
+}
+
+input:checked + .slider:before {
+    transform: translateY(-46px);
+}
+
+.slider.round {
+    border-radius: 34px;    
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.iconTheme {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    transition: .4s;
+    text-align: center;
+}
+
+.iconMoon {
+    top: 4px;
+    margin-left: 5px;
+}
+
+.iconSun {
+    margin-left: 5px;
+    margin-bottom: 2px;
+}

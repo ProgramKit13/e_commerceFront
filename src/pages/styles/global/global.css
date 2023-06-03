@@ -1,4 +1,14 @@
+@font-face {
+    font-family: 'Oxygen';
+    src: url('../../../assets/fonts/Oxygen-Light.ttf') format('truetype'); 
+    font-weight: 400;
+    font-style: normal;
+  }
+
+
+
 :root {
     --color-bg-default: #fdc214;
     --color-secondary-default: #292929;
 }
+

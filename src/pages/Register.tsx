@@ -6,10 +6,12 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
-import {api} from '../api';
+import {api} from '../api/admin/api_admin_user';
 import { validateText, getErrorMessage,  emailValidate, pass_validate, confirm_pass} from '../assets/validators/validator'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faFacebookSquare, faTelegram, faWhatsappSquare } from '@fortawesome/free-brands-svg-icons';
+
+
 
 
 export const Register = () => {
@@ -82,6 +84,7 @@ export const Register = () => {
                acceptError = 'Você deve aceitar os termos de uso.'
             } else {
                 await api.registerUser(addName, addEmail, addPassword);
+                window.location.href = '/login';
             }
         }
 
@@ -187,7 +190,7 @@ export const Register = () => {
                                 </Row>
                             </div>
                             <div className={styles.buttonArea}>
-                                <Col clssName={styles.checkboxCol}>
+                                <Col className={styles.checkboxCol}>
                                 <Form.Check className={styles.checkBox} onChange={handleAccept} required label={<span>Eu aceito os <a href="https://example.com/termos-e-condicoes">termos e condições</a></span>}/>
                                 {acceptError && (
                                         <Row className={styles.errorMessage}>

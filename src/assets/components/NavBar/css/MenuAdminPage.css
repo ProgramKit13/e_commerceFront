@@ -1,19 +1,18 @@
-@font-face {
-  font-family: 'Oxygen';
-  src: url('../../../fonts/Oxygen-Light.ttf');
-}
-
 .body {
-  height: 100vh;
+  height: 100%; 
+  overflow: scroll;
+  position:fixed;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .bodyDashAdminDark {
-  background-color: #181B2E;
+  background-color: #2c3254;
   color: white;
 }
 
 .bodyDashAdminWhite {
-  background-color: #F8F9FC;
+  background-color: rgb(224, 224, 224);
   color: #2C3034;
 }
 
@@ -44,6 +43,7 @@
     position: fixed;
     top: -70px;
     transition: top 0.4s ease-in-out;
+    z-index: 1000;
   }
   
 
@@ -57,6 +57,7 @@
     position: fixed;
     top: -70px;
     transition: top 0.4s ease-in-out;
+    z-index: 1000;
   }
 
   .navBarSlideArea.visible {
@@ -79,7 +80,7 @@
 
 .white {
   background-color: white;
-  color: rgb(112, 110, 110);
+  color: rgb(0, 0, 0);
 }
 
 
@@ -91,31 +92,12 @@
 /*END NAVBAR */
 
 
-
-/*POINTER NAVBAR*/
-.pointerNavBar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  z-index: 1000;
+.buttonTheme {
+  position: fixed;
+  right: 0;
+  margin-right: 20px;
+  top: 150px;
 }
-
-.iconNavDrop {
-  margin-top: 67px;
-  font-size: 2rem;
-  cursor: pointer;
-  color:grey
-}
-
-.iconNavDrop {
-  transition: transform 0.3s ease;
-}
-
-.iconNavDrop.rotate {
-  transform: rotate(180deg);
-}
-/*END POINTER NAVBAR */
 
 
 

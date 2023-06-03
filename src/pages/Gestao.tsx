@@ -7,13 +7,14 @@ import { Clientes } from "./SubPagesGestao/clientes/Clientes";
 import { Financeiro } from "./SubPagesGestao/financeiro/financeiro";
 import { Fornecedores } from "./SubPagesGestao/fornecedores/fornecedores";
 import { NotFound } from "./NotFound";
+import { InterceptResponseFormProvider } from "../assets/components/Gestao/interceptResponseForm";
 
 
 const AxiosAdminRoutesGestao = () => {
   return (
     <Routes>
-      <Route path="/" element={<Produtos/>} />
-      <Route path="produtos" element={<Produtos/>} />
+      <Route path="/" element={<InterceptResponseFormProvider><Produtos/></InterceptResponseFormProvider>} />
+      <Route path="produtos" element={<InterceptResponseFormProvider><Produtos/></InterceptResponseFormProvider>} />
       <Route path="clientes" element={<Clientes/>} />
       <Route path="financeiro" element={<Financeiro />} />
       <Route path="fornecedores" element={<Fornecedores />} /> 
@@ -26,7 +27,7 @@ export const Gestao = () => {
   return (
     <>
       <Container className="bodyContainerAdmin">
-        <Row>
+        <Row className="groupControlRow">
           <GroupControlsGestao/>
         </Row>
         <Row>

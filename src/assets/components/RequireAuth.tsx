@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import {api} from '../../api';
+import {api} from '../../api/admin/api_admin_user';
 
 type Props = {
   children: JSX.Element

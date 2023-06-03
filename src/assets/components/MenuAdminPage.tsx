@@ -1,7 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "./NavBar/css/MenuAdminPage.css";
-import useNavBarController from "./NavBar/controls/control_navBar/ControlNavBar";
 import CarouselPage from "./NavBar/modules/minimized/carousel/Carousel";
 import { FirstMenu } from "./NavBar/modules/expanded/item1";
 import { SecondMenu } from "./NavBar/modules/expanded/Item2";
@@ -15,6 +14,12 @@ import Gestao from "../../pages/Gestao";
 import { NotFound } from "../../pages/NotFound";
 import { setupResizeHandler } from "./NavBar/controls/contentControls/resizeContentPage";
 import { useEffect } from "react";
+import { ThemeContext, TopBarContext} from "./NavBar/controls/controlTheme/SwitchContext";
+
+
+
+
+
 const AxiosAdminRoutes = () => {
   return (
     <Routes>
@@ -30,14 +35,16 @@ const AxiosAdminRoutes = () => {
 
 
 const MenuAdminPage: React.FC = () => {
-  const { navBarRef, navBarSlideAreaRef, contentPageSlideRef } = useNavBarController();
-  useEffect(() => {setupResizeHandler();}, []);
-
+  const { isTheme } = React.useContext(ThemeContext);
+  const { isTopBar } = React.useContext(TopBarContext);
+  
   return (
-    <div className="body bodyDashAdminDark">
+    <div className={`body ${isTheme ? 'bodyDashAdminDark' : 'bodyDashAdminWhite'}`}>
       <Container fluid className="styleContainer">
-        <Container fluid ref={navBarSlideAreaRef} className="navBarSlideArea slideBarDark hidden">
-          <Row ref={navBarRef} className="navBarRow hidden dark">
+        <Container fluid className={`navBarSlideArea ${isTopBar ? 'hidden' : 'visible'} ${isTheme ? 'slideBarDark' : 'slideBarWhite' }`}>
+          
+          <Row className={`navBarRow ${isTopBar ? 'hidden' : 'visible'} ${isTheme ? 'dark' : 'white'}`}>
+
             <Col sm={2} className="menuArea item1">
               <FirstMenu />
             </Col>
@@ -55,7 +62,7 @@ const MenuAdminPage: React.FC = () => {
           </Row>
         </Container>
       </Container>
-      <Container fluid ref={contentPageSlideRef} id="displayPageContainer" className="pageContainer upContentPage">
+      <Container fluid id="displayPageContainer" className={`pageContainer ${isTopBar ? 'upContentPage' : 'downContentPage'}`}>
         <AxiosAdminRoutes />
       </Container>
       <CircularMenu />

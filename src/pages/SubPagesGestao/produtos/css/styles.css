@@ -1,8 +1,29 @@
+.namePage {
+    text-align: end;
+}
+
 .groupControlGestaoButtons {
     display: flex;
 }
 
-.alignCardHeader {
-    display: flex;
-    justify-content: end;
+.tableProdResponse {
+    height: 400px ;
+    overflow: auto;
+    position: relative;
+}
+
+.cardProducts {
+    padding-bottom: 20px;
+}
+
+.formQtList {
+    margin-right: 20px;
+}
+
+
+
+@media (max-width: 760px) {
+    .groupControlGestaoButtons {
+        display: none;
+    }
 }

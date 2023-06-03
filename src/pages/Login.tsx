@@ -4,9 +4,8 @@ import logoAxios from './styles/login/images/logoAxios.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faFacebook, faTelegram, faWhatsappSquare } from '@fortawesome/free-brands-svg-icons';
 import React, { useState } from 'react';
-import {api} from '../api';
-import {getErrorMessage,  emailValidate, pass_validate} from '../assets/validators/validator'
-import { useNavigate } from "react-router-dom";
+import {api} from '../api/admin/api_admin_user';
+import { emailValidate, pass_validate} from '../assets/validators/validator'
 
 export const Login = () => {    
     const [insertEmail, setInsertEmail] = useState('');

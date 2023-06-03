@@ -1,5 +1,3 @@
-import React from 'react';
-
 type TableData = {
   produto: string;
   vRevenda: string;

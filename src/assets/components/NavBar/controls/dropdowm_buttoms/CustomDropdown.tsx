@@ -5,7 +5,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 interface CustomDropdownProps {
   icon: IconDefinition;
-  items: Array<{ text: string; href?: string; onClick?: () => void }>;
+  items: Array<{ text: string; icon?: IconDefinition; href?: string; onClick?: () => void }>;
 }
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({ icon, items }) => {
@@ -15,7 +15,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ icon, items }) => {
       <Dropdown.Menu>
         {items.map((item, index) => (
           <Dropdown.Item key={index} href={item.href} onClick={item.onClick}>
-            {item.text}
+            {item.icon && <FontAwesomeIcon icon={item.icon} />} {item.text}
           </Dropdown.Item>
         ))}
       </Dropdown.Menu>

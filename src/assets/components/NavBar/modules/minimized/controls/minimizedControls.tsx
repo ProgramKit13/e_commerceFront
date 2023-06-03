@@ -7,13 +7,13 @@ export const MinimizedControls = () => {
         <Col sm={6} className="controlDisplayMin">
             <Row className="rowDisplayMin">
             <Col sm={3} className="controlsPage control1">
-            <ControlButton icon={faChartLine} title="Dashboard" colorClass="dashBoardControl"/>
+            <ControlButton icon={faChartLine} title="Dashboard" colorClass="dashBoardControl" to="dashboard"/>
             </Col>
             <Col sm={3} className="controlsPage control2">
-            <ControlButton icon={faThLarge} title="Gestão" colorClass="adminControl"/>
+            <ControlButton icon={faThLarge} title="Gestão" colorClass="adminControl" to="gestao"/>
             </Col>
             <Col sm={3} className="controlsPage control3">
-            <ControlButton icon={faDesktop} title="Ambiente" colorClass="plataformControl" />
+            <ControlButton icon={faDesktop} title="Ambiente" colorClass="plataformControl" to="dashboard" />
             </Col>
         </Row>
       </Col>
