@@ -81,6 +81,7 @@ export const api = {
               });
           
               let json = await response.json();
+              console.log(json);
               return { code: response.status, data: json };
             } catch (error: any) {
               return error as ReponseData;

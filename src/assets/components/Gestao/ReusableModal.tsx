@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import { IconType } from 'react-icons';
 import { useInterceptResponseFormContext  } from '../../../assets/components/Gestao/interceptResponseForm';
 import { ThemeContext } from '../NavBar/controls/controlTheme/SwitchContext';
-
+import Form from 'react-bootstrap/Form';
 
 interface ReusableModalProps {
   title: string;
@@ -36,7 +36,7 @@ const ReusableModal: React.FC<ReusableModalProps> = ({ id, title, children, butt
   return (
     <>
       <button className={`defaultButtonPageAdmin ${isTheme ? 'controlDark' : 'controlWhite'}`} onClick={handleShow}>
-        {buttonText}<Icon />
+      <Icon /> {buttonText}
       </button>
 
       <Modal show={show} onHide={handleClose} id={id}>

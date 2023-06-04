@@ -1,5 +1,5 @@
 import React, { forwardRef, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row } from 'react-bootstrap';
 import { NumericFormat } from 'react-number-format';
 
 interface ProductFormProps {
@@ -18,8 +18,11 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
   const [addSupplier, setAddSupplier] = useState('');
   const [addDescription, setAddDescription] = useState('');
   const [addDatePurchase, setAddDatePurchase] = useState(''); 
-  
+  const [addNewSetorClicked, setAddNewSetorClicked] = useState(false);
 
+  const handleAddNewSetorClick = () => {
+    setAddNewSetorClicked(!addNewSetorClicked);
+  };
   const handleAddName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddName(event.target.value);
   };
@@ -147,11 +150,31 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
         </Col>
       </Row>
       <Row>
-        <Col>
+        <Col xs={5}>
           <Form.Group controlId="datePurchase">
             <Form.Label>Data da Compra</Form.Label>
             <Form.Control type="date" value={addDatePurchase} onChange={handleAddDatePurchase} />
           </Form.Group>
+        </Col>
+        <Col xs={6}>
+          <Form.Group className="mb-3" controlId="setorSelect">
+              <Form.Label>Setor</Form.Label>
+              {addNewSetorClicked ? (
+                <Form.Control type="text" />
+              ) : (
+                <Form.Select>
+                  <option></option>
+                  <option value="1">One</option>
+                  <option value="2">Two</option>
+                  <option value="3">Three</option>
+                </Form.Select>
+              )}
+          </Form.Group>
+        </Col>
+        <Col xs={1}>
+          <Button className="addNewSetor" variant="primary" type="button" size="sm" onClick={handleAddNewSetorClick}>
+            {addNewSetorClicked ? '-' : '+'}
+          </Button>
         </Col>
       </Row>
       <Row>

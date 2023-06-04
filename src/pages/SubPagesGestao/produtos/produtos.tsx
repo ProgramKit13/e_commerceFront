@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Table, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Form, Button } from 'react-bootstrap';
 import DataTableBody from './components/DataTableBody';
 import ReusableModal from '../../../assets/components/Gestao/ReusableModal';
 import { MdAddCircle } from 'react-icons/md';
@@ -11,6 +11,10 @@ import './css/styles.css';
 import AdvancedPagination from '../../../assets/components/Gestao/Pagination.Default';
 import { ThemeContext } from '../../../assets/components/NavBar/controls/controlTheme/SwitchContext';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { FormFilter } from './components/FormFilter';
+
+
+
 
 export const Produtos  = () => {
   const { confirm, interceptResponseForm } = useInterceptResponseFormContext();
@@ -41,10 +45,12 @@ export const Produtos  = () => {
   
     if (listAllProducts.code === 200) {
       setPaginationData(listAllProducts.data.products);
+      const sectorsList = listAllProducts.data.sectors;
       const totalProducts = listAllProducts.data.products.total;
       const enumProduct = listAllProducts.data.enum;
       setEnumProduct(enumProduct);
       setTotalProducts(totalProducts);
+      
       const productList = listAllProducts.data.products.list.map((product: any) => {
         return {
           token: product.token,
@@ -53,7 +59,8 @@ export const Produtos  = () => {
           vCusto: product.valueResale,
           mDesc: product.discount,
           qt: product.qt,
-          fornecedor: product.supplier
+          fornecedor: product.supplier,
+          setor: product.sector
         };
       });
       setProductList(productList);
@@ -83,7 +90,8 @@ export const Produtos  = () => {
               vCusto: product.valueResale,
               mDesc: product.discount,
               qt: product.qt,
-              fornecedor: product.supplier
+              fornecedor: product.supplier,
+              setor: product.sector
             };
           });
           setProductList(productList);
@@ -124,6 +132,11 @@ export const Produtos  = () => {
     if (selectEnumListProd > paginationData.per_page) {
       setPaginationData(prevState => ({ ...prevState, page: 1 }));
     }
+  };
+
+
+  const handleFilter = async (event: ChangeEvent<HTMLSelectElement>) => {
+    const selectEnumListProd = parseInt(event.target.value);
   };
 
 
@@ -290,19 +303,27 @@ export const Produtos  = () => {
             <Card bg={`${isTheme ? 'dark' : 'white'}`} className="shadow">
               <Card.Header className="py-2 alignCardHeader">
                 <Row>
-                  <Col>
-                  <InputGroup>
-                    <Form.Control
-                      type="text"
-                      placeholder="Procurar produto"
-                      aria-describedby="buttonSearch"
-                      id='searchProduct'
-                      
-                    />
-                     <InputGroup.Text id="buttonSearch" onClick={handleSearch}>?</InputGroup.Text>
-                  </InputGroup>
-                  </Col>
-                  <Col sm={1} className='formQtList'>
+                    <Col lg={3}>
+                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                        <Form.Label>Setor</Form.Label>
+                        <Form.Select aria-label="Default select example">
+                            <option>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                            
+                        </Form.Select>
+                    </Form.Group>
+                    </Col>
+                    <Col lg={5}>
+                        <Form.Label>Buscar</Form.Label>
+                        <InputGroup>
+                          <Form.Control type="text" placeholder="Procurar por produto" aria-describedby="buttonSearch" id='searchProduct'/>
+                          <InputGroup.Text id="buttonSearch" onClick={handleSearch}>?</InputGroup.Text>
+                        </InputGroup>
+                    </Col>
+                  <Col lg={2} className='formQtList'>
+                    <Form.Label>Qt.</Form.Label>
                     <Form.Select 
                           aria-label="qtList" 
                           onChange={handleQtProd}
@@ -312,24 +333,34 @@ export const Produtos  = () => {
                           ))}
                     </Form.Select>
                   </Col>
-                  <Col>
-                    <ReusableModal id="adicionarProduto" title="Adicionar Produto" buttonText="Adicionar " icon={MdAddCircle} onSave={handleSave}>
+                  <Col lg={2} className='teste'>
+                    <ReusableModal id="adicionarProduto" title="Adicionar Produto" buttonText="Produtos" icon={MdAddCircle} onSave={handleSave}>
                       <ProductForm/>
                     </ReusableModal>
-                  </Col>  
-                  </Row>            
+                  </Col>                  
+                </Row>
+                <Row>
+                  <FormFilter/>
+                </Row>
+                <Row>
+                  <Col sm={3}>
+                    <Button variant="outline-secondary" className='btnFilter'>
+                      Filtrar
+                    </Button>
+                  </Col>
+                </Row>            
               </Card.Header>
               <Card.Body>
                 <div className="table-responsive table mb-0 pt-3 pe-2 tableProdResponse">
                   <Table className={`table-striped table-hover ${isTheme ? 'table-dark' : ''} table-sm my-0 mydatatable`}>
                   <thead>
                       <tr>
-                        <th>Produtos</th>
-                        <th>V. Revenda</th>
-                        <th>V. Custo</th>
-                        <th>M. Desc</th>
-                        <th>Qt.</th>
-                        <th>Forne.</th>
+                        <th>Produto</th>
+                        <th>Revenda</th>
+                        <th>Custo</th>
+                        <th>Quantidade</th>
+                        <th>Fornecedor</th>
+                        <th>Setor</th>
                       </tr>
                     </thead>
                     <DataTableBody data={productList} />

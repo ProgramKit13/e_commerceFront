@@ -2,9 +2,9 @@ type TableData = {
   produto: string;
   vRevenda: string;
   vCusto: string;
-  mDesc: string;
   qt: number;
   fornecedor: string;
+  setor: string;
 }
 
 type DataTableBodyProps = {
@@ -21,9 +21,9 @@ export default function DataTableBody(props: DataTableBodyProps) {
           <td>{item.produto}</td>
           <td>{item.vRevenda}</td>
           <td>{item.vCusto}</td>
-          <td>{item.mDesc}</td>
           <td>{item.qt}</td>
           <td>{item.fornecedor}</td>
+          <td>{item.setor}</td>
         </tr>
       ))}
     </tbody>
