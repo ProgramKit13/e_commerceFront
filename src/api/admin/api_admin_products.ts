@@ -1,4 +1,4 @@
-type ReponseData = {
+type ResponseData = {
     code: number;
     data?: any;
     error?: string;
@@ -6,7 +6,7 @@ type ReponseData = {
 
 
 export const api = {
-          AuthCheck: async (token: string, refreshToken: string): Promise<ReponseData> => {
+          AuthCheck: async (token: string, refreshToken: string): Promise<ResponseData> => {
             try {
               const response = await fetch('http://127.0.0.1:5000/protected', 
                 {
@@ -49,8 +49,8 @@ export const api = {
 
 
           registerProduct: async (
-            prodName: string, valueResale: number, cust: number, tax: number = 0, supplier: string = '', discount: number = 0, description: string = '', qt: number = 0, datePurchase: Date | string
-          ) : Promise<ReponseData> => {
+            prodName: string, valueResale: number, cust: number, tax: number = 0, supplier: string = '', discount: number = 0, description: string = '', qt: number = 0, datePurchase: Date | string, sector: string = ''
+          ) : Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
               const refreshToken = localStorage.getItem('refreshToken') || '';
@@ -72,7 +72,8 @@ export const api = {
                   discount: discount,
                   description: description,
                   qt: qt,
-                  datePurchase: datePurchase
+                  datePurchase: datePurchase,
+                  sector: sector
                 }),
                 headers: {
                   'Content-Type': 'application/json',
@@ -84,12 +85,12 @@ export const api = {
               console.log(json);
               return { code: response.status, data: json };
             } catch (error: any) {
-              return error as ReponseData;
+              return error as ResponseData;
             }
           },
           
 
-          consultAdminProducts: async (page: number = 1): Promise<ReponseData> => {
+          consultAdminProducts: async (page: number = 1): Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
               const refreshToken = localStorage.getItem('refreshToken') || '';
@@ -111,12 +112,12 @@ export const api = {
               let json = await response.json();
               return { code: response.status, data: json };
             } catch (error: any) {
-              return error as ReponseData;
+              return error as ResponseData;
             }
           },
 
 
-          updatePerPageProductsEnum: async (perPage: number): Promise<ReponseData> => {
+          updatePerPageProductsEnum: async (perPage: number): Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
               const refreshToken = localStorage.getItem('refreshToken') || '';
@@ -141,11 +142,11 @@ export const api = {
               let json = await response.json();
               return { code: response.status, data: json };
             } catch (error: any) {
-              return error as ReponseData;
+              return error as ResponseData;
             }
           },
 
-          searchProduct: async (search: string, page: number = 1): Promise<ReponseData> => {
+          searchProduct: async (type: string, search: string, page: number = 1): Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
               const refreshToken = localStorage.getItem('refreshToken') || '';
@@ -156,7 +157,7 @@ export const api = {
                 throw new Error('Invalid token');
               }
           
-              let response = await fetch(`http://127.0.0.1:5000/axiosadmin/gestao/produtos/busca/${search}?page=${page}`, {
+              let response = await fetch(`http://127.0.0.1:5000/axiosadmin/gestao/produtos/busca/${type}/${search}?page=${page}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -176,7 +177,7 @@ export const api = {
               
               return { code: response.status, data: {products: products, pagination: paginationInfo}};
             } catch (error: any) {
-              return error as ReponseData;
+              return error as ResponseData;
             }
           },
           

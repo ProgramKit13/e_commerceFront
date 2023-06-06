@@ -2,13 +2,15 @@ import React, { forwardRef, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { NumericFormat } from 'react-number-format';
 
+
 interface ProductFormProps {
-    // Props do componente (se necessário)
+  sectorList: string[];
 }
 
 const CustomInput = forwardRef((props, ref) => <Form.Control {...props}  />);
 
 const ProductForm: React.FC<ProductFormProps> = (props) => {
+  const { sectorList } = props;
   const [addName, setAddName] = useState('');
   const [addResaleValue, setAddResaleValue] = useState('');
   const [addCost, setAddCost] = useState('');
@@ -74,7 +76,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
       <Row>
         <Col>
           <Form.Group controlId="productResaleValue">
-            <Form.Label>Valor de Revenda</Form.Label>
+            <Form.Label>Valor de venda</Form.Label>
             <NumericFormat
               thousandSeparator="."
               decimalSeparator=","
@@ -89,7 +91,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
         </Col>
         <Col>
           <Form.Group controlId="productCost">
-            <Form.Label>Custo</Form.Label>
+            <Form.Label>Valor de compra</Form.Label>
             <NumericFormat
               thousandSeparator="."
               decimalSeparator=","
@@ -106,7 +108,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
       <Row>
         <Col>
           <Form.Group controlId="productTax">
-            <Form.Label>Taxa</Form.Label>
+            <Form.Label>Imposto</Form.Label>
             <NumericFormat
               thousandSeparator="."
               decimalSeparator=","
@@ -144,7 +146,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
         </Col>
         <Col>
           <Form.Group controlId="productSupplier">
-            <Form.Label>Fornecedores</Form.Label>
+            <Form.Label>Fornecedor</Form.Label>
             <Form.Control type="text" value={addSupplier} onChange={handleAddSupplier} />
           </Form.Group>
         </Col>
@@ -157,25 +159,28 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
           </Form.Group>
         </Col>
         <Col xs={6}>
-          <Form.Group className="mb-3" controlId="setorSelect">
-              <Form.Label>Setor</Form.Label>
-              {addNewSetorClicked ? (
-                <Form.Control type="text" />
-              ) : (
-                <Form.Select>
-                  <option></option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </Form.Select>
-              )}
+        <Form.Group className="mb-3" controlId="setorSelect">
+            <Form.Label>Categoria</Form.Label>
+            {addNewSetorClicked || sectorList.length === 0 ? (
+              <Form.Control type="text" />
+            ) : (
+              <Form.Select>
+                {sectorList.map((sector, index) => (
+                  <option key={index}>
+                    {sector}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
           </Form.Group>
         </Col>
-        <Col xs={1}>
-          <Button className="addNewSetor" variant="primary" type="button" size="sm" onClick={handleAddNewSetorClick}>
-            {addNewSetorClicked ? '-' : '+'}
-          </Button>
-        </Col>
+        {sectorList.length > 0 && (
+          <Col xs={1}>
+            <Button className="addNewSetor" variant="primary" type="button" size="sm" onClick={handleAddNewSetorClick}>
+              {addNewSetorClicked ? '-' : '+'}
+            </Button>
+          </Col>
+        )}
       </Row>
       <Row>
         <Col>

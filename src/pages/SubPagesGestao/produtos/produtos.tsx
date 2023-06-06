@@ -22,6 +22,7 @@ export const Produtos  = () => {
   const [totalProducts, setTotalProducts] = useState(0);
   const [productList, setProductList] = useState([]);
   const [enumProduct, setEnumProduct] = useState([]);
+  const [sectorList, setSectorList] = useState([]);
   const [paginationData, setPaginationData] = useState({
     list: [],
     next: '',
@@ -42,7 +43,6 @@ export const Produtos  = () => {
     }
   
     const listAllProducts = await api.consultAdminProducts(paginationData.page);
-  
     if (listAllProducts.code === 200) {
       setPaginationData(listAllProducts.data.products);
       const sectorsList = listAllProducts.data.sectors;
@@ -50,7 +50,8 @@ export const Produtos  = () => {
       const enumProduct = listAllProducts.data.enum;
       setEnumProduct(enumProduct);
       setTotalProducts(totalProducts);
-      
+      setSectorList(sectorsList);
+      console.log(sectorList)
       const productList = listAllProducts.data.products.list.map((product: any) => {
         return {
           token: product.token,
@@ -73,13 +74,15 @@ export const Produtos  = () => {
   const handleSearch = async () => {
     try {
       const inputElement = document.getElementById('searchProduct') as HTMLInputElement;
+      const inputElementSearch = document.getElementById('filterSearch') as HTMLInputElement;
       if (inputElement) {
         const searchValue = inputElement.value;
+        const typeSearch = inputElementSearch.value;
         if (searchValue === "") {
           fetchData();
           return;
         }
-        const searchProduct = await api.searchProduct(searchValue);
+        const searchProduct = await api.searchProduct(typeSearch, searchValue);
         if (searchProduct.code === 200) {
           const totalProducts = searchProduct.data.pagination.total;
           const productList = searchProduct.data.products.map((product: any) => {
@@ -190,6 +193,7 @@ export const Produtos  = () => {
     const productSupplier = document.getElementById('productSupplier') as HTMLInputElement;
     const productDescription = document.getElementById('productDescription') as HTMLInputElement;
     const productDatePurchase = document.getElementById('datePurchase') as HTMLInputElement;
+    const productSectorSelect = document.getElementById('setorSelect') as HTMLInputElement;
 
     const verifyProductName = validateText(productName.value);
     let nameProductError = '';
@@ -248,6 +252,13 @@ export const Produtos  = () => {
     if (typeof verifyProductSupplier === 'object' && Object.keys(verifyProductSupplier).length > 0) {
       supplierProductError = getErrorMessage(verifyProductSupplier);
     }
+
+    const verifyProductSector = validateText(productSectorSelect.value);
+    let supplierSectortError = '';
+  
+    if (typeof verifyProductSector === 'object' && Object.keys(verifyProductSector).length > 0) {
+      supplierProductError = getErrorMessage(verifyProductSector);
+    }
   
   
     const verifyProductDescription = validateTextofDescription(productDescription.value);
@@ -268,7 +279,7 @@ export const Produtos  = () => {
   
   
   
-    if (!nameProductError && !priceProductError && !costProductError && !taxProductError && !discountProductError && !quantityProductError && !supplierProductError && !descriptionProductError && !datePurchaseProductError) {
+    if (!nameProductError && !priceProductError && !costProductError && !taxProductError && !discountProductError && !quantityProductError && !supplierProductError && !descriptionProductError && !datePurchaseProductError && !supplierSectortError) {
       const product = {
         prodName: productName.value,
         valueResale: Number(Number(productPrice.value.replace('R$', '').replace('.', '').replace(',', '.')).toFixed(1)),
@@ -277,10 +288,11 @@ export const Produtos  = () => {
         discount: Number(Number(productDiscount.value.replace('%', '').replace('.', '').replace(',', '.')).toFixed(1)),
         qt: Number(productQuantity.value),
         supplier: productSupplier.value,
+        sector: productSectorSelect.value,
         description: productDescription.value,
         datePurchase: productDatePurchase.value
       };
-      let response = await api.registerProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase);
+      let response = await api.registerProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase, product.sector);
       
       interceptResponseForm(response.code);
       if (response.code === 200 || response.code === 201) {
@@ -304,14 +316,13 @@ export const Produtos  = () => {
               <Card.Header className="py-2 alignCardHeader">
                 <Row>
                     <Col lg={3}>
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label>Setor</Form.Label>
-                        <Form.Select aria-label="Default select example">
-                            <option>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                            
+                    <Form.Group className="mb-3" controlId="formFilterSearch">
+                        <Form.Label>Filtro de busca</Form.Label>
+                        <Form.Select aria-label="Filtro de busca" id='filterSearch' defaultValue="nome">
+                          <option value="nome">Nome</option>
+                          <option value="fornecedor">Fornecedor</option>
+                          <option value="setor">Categoria</option>
+                          <option value="descricao">Descrição</option>
                         </Form.Select>
                     </Form.Group>
                     </Col>
@@ -323,7 +334,7 @@ export const Produtos  = () => {
                         </InputGroup>
                     </Col>
                   <Col lg={2} className='formQtList'>
-                    <Form.Label>Qt.</Form.Label>
+                    <Form.Label>Quantidade</Form.Label>
                     <Form.Select 
                           aria-label="qtList" 
                           onChange={handleQtProd}
@@ -335,7 +346,7 @@ export const Produtos  = () => {
                   </Col>
                   <Col lg={2} className='teste'>
                     <ReusableModal id="adicionarProduto" title="Adicionar Produto" buttonText="Produtos" icon={MdAddCircle} onSave={handleSave}>
-                      <ProductForm/>
+                      <ProductForm sectorList={sectorList}/>
                     </ReusableModal>
                   </Col>                  
                 </Row>
@@ -356,11 +367,15 @@ export const Produtos  = () => {
                   <thead>
                       <tr>
                         <th>Produto</th>
-                        <th>Revenda</th>
                         <th>Custo</th>
+                        <th>Revenda</th>
+                        <th>Imposto</th>
                         <th>Quantidade</th>
+                        <th>Unidade Medida</th>
                         <th>Fornecedor</th>
-                        <th>Setor</th>
+                        <th>Categoria</th>
+                        <th>COD</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <DataTableBody data={productList} />
