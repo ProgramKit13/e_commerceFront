@@ -49,12 +49,14 @@ export const api = {
 
 
           registerProduct: async (
-            prodName: string, valueResale: number, cust: number, tax: number = 0, supplier: string = '', discount: number = 0, description: string = '', qt: number = 0, datePurchase: Date | string, sector: string = ''
+            prodName: string, valueResale: number, cust: number, tax: number = 0, supplier: string = '', discount: number = 0, description: string = '', qt: number = 0, datePurchase: Date | string, sector: string = '', 
+            supplierCode: string = '', manufacturer: string = '', weight: number = 0, weightUnit: string = '', dimensions: string = '', dimensionsUnit: string = '', barCode: string = '', lastUpdate: Date | string, 
+            reorderPoint: number = 0, restockTime: number = 0, warrantyInfo: string = '', batchInfo: string = '', expireDate: Date | string, materialOrIngredients: string = '', safetyRating: string = '', shippingRestrictions: string = ''
           ) : Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
               const refreshToken = localStorage.getItem('refreshToken') || '';
-
+          
               const authCheckResponse = await api.AuthCheck(token, refreshToken);
           
               if (authCheckResponse.code !== 200) {
@@ -73,7 +75,23 @@ export const api = {
                   description: description,
                   qt: qt,
                   datePurchase: datePurchase,
-                  sector: sector
+                  sector: sector,
+                  supplierCode: supplierCode,
+                  manufacturer: manufacturer,
+                  weight: weight,
+                  weightUnit: weightUnit,
+                  dimensions: dimensions,
+                  dimensionsUnit: dimensionsUnit,
+                  barcode: barCode,
+                  lastUpdated: lastUpdate,
+                  reorderPoint: reorderPoint,
+                  restockTime: restockTime,
+                  warrantyInfo: warrantyInfo,
+                  batchInfo: batchInfo,
+                  expiryDate: expireDate,
+                  materialOrIngredients: materialOrIngredients,
+                  safetyRating: safetyRating,
+                  shippingRestrictions: shippingRestrictions
                 }),
                 headers: {
                   'Content-Type': 'application/json',

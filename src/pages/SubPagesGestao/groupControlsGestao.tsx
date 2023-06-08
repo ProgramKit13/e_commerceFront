@@ -7,7 +7,6 @@ export const GroupControlsGestao = () => {
   const location = useLocation();
   const getPageName = () => {
     const path = location.pathname;
-    console.log(path);
     switch (path) {
       case '/axiosadmin/gestao/produtos':
         return 'Produtos';

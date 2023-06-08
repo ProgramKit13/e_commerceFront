@@ -108,7 +108,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
       <Row>
         <Col>
           <Form.Group controlId="productTax">
-            <Form.Label>Imposto</Form.Label>
+            <Form.Label>Taxa</Form.Label>
             <NumericFormat
               thousandSeparator="."
               decimalSeparator=","
@@ -160,7 +160,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
         </Col>
         <Col xs={6}>
         <Form.Group className="mb-3" controlId="setorSelect">
-            <Form.Label>Categoria</Form.Label>
+            <Form.Label>Setor</Form.Label>
             {addNewSetorClicked || sectorList.length === 0 ? (
               <Form.Control type="text" />
             ) : (

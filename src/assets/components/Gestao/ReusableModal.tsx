@@ -4,7 +4,6 @@ import Modal from 'react-bootstrap/Modal';
 import { IconType } from 'react-icons';
 import { useInterceptResponseFormContext  } from '../../../assets/components/Gestao/interceptResponseForm';
 import { ThemeContext } from '../NavBar/controls/controlTheme/SwitchContext';
-import Form from 'react-bootstrap/Form';
 
 interface ReusableModalProps {
   title: string;

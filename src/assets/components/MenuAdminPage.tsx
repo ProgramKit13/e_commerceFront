@@ -12,8 +12,6 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../../pages/Home";
 import Gestao from "../../pages/Gestao";
 import { NotFound } from "../../pages/NotFound";
-import { setupResizeHandler } from "./NavBar/controls/contentControls/resizeContentPage";
-import { useEffect } from "react";
 import { ThemeContext, TopBarContext} from "./NavBar/controls/controlTheme/SwitchContext";
 
 

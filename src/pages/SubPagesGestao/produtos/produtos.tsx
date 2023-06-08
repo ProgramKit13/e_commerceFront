@@ -1,8 +1,6 @@
 import { Container, Row, Col, Card, Table, Form, Button } from 'react-bootstrap';
 import DataTableBody from './components/DataTableBody';
-import ReusableModal from '../../../assets/components/Gestao/ReusableModal';
 import { MdAddCircle } from 'react-icons/md';
-import ProductForm from './components/BodyAddProduct';
 import { validateText, getErrorMessage, valueInput, validateQuantity, validateTextofDescription, isValidDate } from '../../../assets/validators/validator';
 import { api } from '../../../api/admin/api_admin_products';
 import { useInterceptResponseFormContext  } from '../../../assets/components/Gestao/interceptResponseForm';
@@ -12,6 +10,8 @@ import AdvancedPagination from '../../../assets/components/Gestao/Pagination.Def
 import { ThemeContext } from '../../../assets/components/NavBar/controls/controlTheme/SwitchContext';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { FormFilter } from './components/FormFilter';
+import { Routes, Route, Link } from 'react-router-dom';
+import AdcProdutos from './AdcProdutos';
 
 
 
@@ -183,128 +183,7 @@ export const Produtos  = () => {
     setPaginationData(prevState => ({...prevState, page: paginationData.pages}));
   };
 
-  const handleSave = async () => {
-    const productName = document.getElementById('productName') as HTMLInputElement;
-    const productPrice = document.getElementById('productResaleValue') as HTMLInputElement;
-    const productCost = document.getElementById('productCost') as HTMLInputElement;
-    const productTax = document.getElementById('productTax') as HTMLInputElement;
-    const productDiscount = document.getElementById('productDiscount') as HTMLInputElement;
-    const productQuantity = document.getElementById('productQuantity') as HTMLInputElement;
-    const productSupplier = document.getElementById('productSupplier') as HTMLInputElement;
-    const productDescription = document.getElementById('productDescription') as HTMLInputElement;
-    const productDatePurchase = document.getElementById('datePurchase') as HTMLInputElement;
-    const productSectorSelect = document.getElementById('setorSelect') as HTMLInputElement;
-
-    const verifyProductName = validateText(productName.value);
-    let nameProductError = '';
   
-    if (typeof verifyProductName === 'object' && Object.keys(verifyProductName).length > 0) {
-      nameProductError = getErrorMessage(verifyProductName);
-      console.log(nameProductError);
-    }
-  
-  
-  
-    const verifyProductPrice = valueInput(productPrice.value);
-    let priceProductError = '';
-  
-    if (verifyProductPrice === false) {
-      priceProductError = 'Valor inválido';
-    }
-  
-  
-    const verifyProductCost = valueInput(productCost.value);
-    let costProductError = '';
-  
-    if (verifyProductCost === false) {
-      costProductError = 'Valor inválido';
-    }
-  
-  
-    const verifyProductTax = valueInput(productTax.value);
-    let taxProductError = '';
-  
-    if (verifyProductTax === false) {
-      taxProductError = 'Valor inválido';
-    }
-  
-  
-  
-    const verifyProductDiscount = valueInput(productDiscount.value);
-    let discountProductError = '';
-  
-    if (verifyProductDiscount === false) {
-      discountProductError = 'Valor inválido';
-    }
-  
-    
-    const verifyProductQuantity = validateQuantity(Number(productQuantity.value));
-    let quantityProductError = '';
-  
-    if (verifyProductQuantity === false) {
-      discountProductError = 'Valor inválido';
-    }
-  
-  
-    const verifyProductSupplier = validateText(productSupplier.value);
-    let supplierProductError = '';
-  
-    if (typeof verifyProductSupplier === 'object' && Object.keys(verifyProductSupplier).length > 0) {
-      supplierProductError = getErrorMessage(verifyProductSupplier);
-    }
-
-    const verifyProductSector = validateText(productSectorSelect.value);
-    let supplierSectortError = '';
-  
-    if (typeof verifyProductSector === 'object' && Object.keys(verifyProductSector).length > 0) {
-      supplierProductError = getErrorMessage(verifyProductSector);
-    }
-  
-  
-    const verifyProductDescription = validateTextofDescription(productDescription.value);
-    let descriptionProductError = '';
-  
-    
-    if (typeof verifyProductDescription === 'object' && Object.keys(verifyProductDescription).length > 0) {
-      descriptionProductError = getErrorMessage(verifyProductDescription);
-    }
-  
-    const verifyProductDatePurchase = isValidDate(productDatePurchase.value);
-    let datePurchaseProductError = '';
-  
-    if (!verifyProductDatePurchase) {
-      datePurchaseProductError = 'Data inválida';
-    }
-  
-  
-  
-  
-    if (!nameProductError && !priceProductError && !costProductError && !taxProductError && !discountProductError && !quantityProductError && !supplierProductError && !descriptionProductError && !datePurchaseProductError && !supplierSectortError) {
-      const product = {
-        prodName: productName.value,
-        valueResale: Number(Number(productPrice.value.replace('R$', '').replace('.', '').replace(',', '.')).toFixed(1)),
-        cust: Number(Number(productCost.value.replace('R$', '').replace('.', '').replace(',', '.')).toFixed(1)),
-        tax: Number(Number(productTax.value.replace('R$', '').replace('.', '').replace(',', '.')).toFixed(1)),
-        discount: Number(Number(productDiscount.value.replace('%', '').replace('.', '').replace(',', '.')).toFixed(1)),
-        qt: Number(productQuantity.value),
-        supplier: productSupplier.value,
-        sector: productSectorSelect.value,
-        description: productDescription.value,
-        datePurchase: productDatePurchase.value
-      };
-      let response = await api.registerProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase, product.sector);
-      
-      interceptResponseForm(response.code);
-      if (response.code === 200 || response.code === 201) {
-        alert('Produto cadastrado com sucesso!');
-        fetchData();
-      } else {
-        alert('Erro ao cadastrar o produto produtos.');
-      }
-    } else {
-      alert('Erro ao cadastrar o produto produtos.');
-    }
-  };
 
     return (
         <>
@@ -344,10 +223,8 @@ export const Produtos  = () => {
                           ))}
                     </Form.Select>
                   </Col>
-                  <Col lg={2} className='teste'>
-                    <ReusableModal id="adicionarProduto" title="Adicionar Produto" buttonText="Produtos" icon={MdAddCircle} onSave={handleSave}>
-                      <ProductForm sectorList={sectorList}/>
-                    </ReusableModal>
+                  <Col lg={2} className='toPageAddProduct'>
+                    <Link className='btnAddProduct' to="adicionarprodutos">Adicioanr Produto</Link>
                   </Col>                  
                 </Row>
                 <Row>
