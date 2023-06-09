@@ -1,11 +1,13 @@
-export const validateDiferentText = (text: string) => {
+export const validateDiferentText = (text: string, required:boolean, pureText: boolean) => {
     let verify = true;
     const msgm: { [key: string]: string } = {};
 
-    if (text === '') {
+    if (text === '' && required) {
         verify = false;
         msgm['empty'] = 'O campo não pode ser vazio.';
-    } else if (text.length < 3 || text.length > 100) {
+    }
+
+    if ((text !== '') && (text.length < 3 || text.length > 100)) {
         verify = false;
         msgm['amount'] = 'O campo não pode ter menos de 3 caracteres ou mais de 100.';
     } else if (text[0] === ' ' || text[text.length - 1] === ' ') {
@@ -14,22 +16,62 @@ export const validateDiferentText = (text: string) => {
     }
 
     if (
-        text.includes('SELECT') ||
+        text !== '' &&
+        (text.includes('SELECT') ||
         text.includes('UPDATE') ||
         text.includes('DELETE') ||
-        text.includes('INSERT')
+        text.includes('INSERT'))
     ) {
         verify = false;
         msgm['bad_intention'] = 'Tentativa de injeção de SQL.';
     }
 
+    if (text !== '' && pureText) {
+        for (const char of text) {
+            if (
+                char.toLowerCase() !== char.toUpperCase() &&
+                !'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúàèìòùâêîôûãõçÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ0123456789 '.includes(char)
+            ) {
+                verify = false;
+                msgm['char'] = 'Campo contém caracteres inválidos.';
+                break;
+            }
+        }
+    }
+
+    if (verify === true) {
+        text = text.toLowerCase().split(' ').map(word => !isNaN(parseFloat(word.charAt(0))) ? word : word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+    }
+
     if (verify === false) {
         return msgm;
     } else {
-        return '';
+        return text;
     }
 };
 
+export const validateWeight = (weight: string) => {
+    let verify = true;
+    const msgm: { [key: string]: string } = {};
+  
+    if (weight === '') {
+      verify = false;
+      msgm['empty'] = 'O campo não pode ser vazio.';
+    } else {
+      const weightValue = parseFloat(weight);
+  
+      if (isNaN(weightValue) || weightValue < 0 || weightValue > 1000) {
+        verify = false;
+        msgm['amount'] = 'O peso deve ser um valor numérico entre 0 e 1000.';
+      }
+    }
+  
+    if (verify === false) {
+      return msgm;
+    } else {
+      return '';
+    }
+  };
 
 export const valueInput = (value: string): boolean => {
     const normalizedValue = value.replace('R$', '').replace('.', '').replace(',', '.').replace('%', '');
@@ -46,7 +88,7 @@ export const valueInputRequired = (value: string) => {
     let verify = true;
     const msgm: { [key: string]: string } = {};
 
-    if (value.trim() === '') {
+    if (value === '') {
         verify = false;
         msgm['empty'] = 'O campo não pode ser vazio.';
     } else {
@@ -92,51 +134,6 @@ export const validateDimensions = (dimensions: string) => {
     }
 };
 
-
-
-
-export const validateText = (text: string) => {
-    let verify = true;
-    const msgm: { [key: string]: string } = {};
-
-    if (text === '') {
-        verify = false;
-        msgm['empty'] = 'O campo não pode ser vazio.';
-    } else if (text.length < 3 || text.length > 100) {
-        verify = false;
-        msgm['amount'] = 'O campo não pode ter menos de 3 caracteres ou mais de 100.';
-    } else if (text[0] === ' ' || text[text.length - 1] === ' ') {
-        verify = false;
-        msgm['spaces'] = 'Espaços inválidos.';
-    }
-
-    for (const char of text) {
-        if (
-            char.toLowerCase() !== char.toUpperCase() &&
-            !'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúàèìòùâêîôûãõçÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ0 '.includes(char)
-        ) {
-            verify = false;
-            msgm['char'] = 'Campo contém caracteres inválidos.';
-            break;
-        }
-    }
-
-    if (
-        text.includes('SELECT') ||
-        text.includes('UPDATE') ||
-        text.includes('DELETE') ||
-        text.includes('INSERT')
-    ) {
-        verify = false;
-        msgm['bad_intention'] = 'Tentativa de injeção de SQL.';
-    }
-
-    if (verify === false) {
-        return msgm;
-    } else {
-        return '';
-    }
-};
 
 
 
@@ -225,18 +222,27 @@ export const validatePhoneNumber = (phoneNumber: string): boolean => {
 
 
 
-  export const validateQuantity = (quantity: number): boolean => {
+export const validateQuantity = (quantity: number) => {
+    let verify = true;
+    const msgm: { [key: string]: string } = {};
+  
     if (isNaN(quantity) || quantity < 0 || quantity > 1000) {
-      return false;
+      verify = false;
+      msgm['range'] = 'A quantidade deve ser um valor numérico entre 0 e 1000.';
     }
   
-    return true;
+    if (quantity === undefined || quantity === null) {
+      verify = false;
+      msgm['empty'] = 'A quantidade não pode ser vazia.';
+    }
+  
+    if (verify === false) {
+      return msgm;
+    } else {
+      return '';
+    }
   };
 
-
-  export const isValidDate = (dateString: string): boolean => {
-    return !isNaN(Date.parse(dateString));
-};
 
 export const validateBarCode = (barCode: string) => {
     let verify = true;
@@ -258,6 +264,14 @@ export const validateBarCode = (barCode: string) => {
             return '';
         }
     }
+};
+
+export const validateSupplierCode = (supplierCode: string) => {
+    const supplier_code_pattern = /^[A-Z]{3}\d{3}$/;
+    if (!supplier_code_pattern.test(supplierCode)) {
+        return { format: 'Ex. ABC123' };
+    }
+    return '';
 };
 
 export const getErrorMessage = (msgm: { [key: string]: string }) => {

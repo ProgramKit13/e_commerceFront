@@ -50,8 +50,8 @@ export const api = {
 
           registerProduct: async (
             prodName: string, valueResale: number, cust: number, tax: number = 0, supplier: string = '', discount: number = 0, description: string = '', qt: number = 0, datePurchase: Date | string, sector: string = '', 
-            supplierCode: string = '', manufacturer: string = '', weight: number = 0, weightUnit: string = '', dimensions: string = '', dimensionsUnit: string = '', barCode: string = '', lastUpdate: Date | string, 
-            reorderPoint: number = 0, restockTime: number = 0, warrantyInfo: string = '', batchInfo: string = '', expireDate: Date | string, materialOrIngredients: string = '', safetyRating: string = '', shippingRestrictions: string = ''
+            supplierCode: string = '', manufacturer: string = '', weight: number = 0, weightUnit: string = '', dimensions: string = '', dimensionsUnit: string = '', barCode: string = '', lastUpdate:  Date | string | null = null, 
+            reorderPoint: number = 0, restockTime: number = 0, warrantyInfo: string = '', batchInfo: string = '', expireDate: Date | string | null = null, materialOrIngredients: string = '', safetyRating: string = '', shippingRestrictions: string = ''
           ) : Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
@@ -83,12 +83,12 @@ export const api = {
                   dimensions: dimensions,
                   dimensionsUnit: dimensionsUnit,
                   barcode: barCode,
-                  lastUpdated: lastUpdate,
+                  lastUpdated: lastUpdate === null ? null : lastUpdate,
                   reorderPoint: reorderPoint,
                   restockTime: restockTime,
                   warrantyInfo: warrantyInfo,
                   batchInfo: batchInfo,
-                  expiryDate: expireDate,
+                  expiryDate: expireDate === null ? null : expireDate,
                   materialOrIngredients: materialOrIngredients,
                   safetyRating: safetyRating,
                   shippingRestrictions: shippingRestrictions
@@ -100,7 +100,6 @@ export const api = {
               });
           
               let json = await response.json();
-              console.log(json);
               return { code: response.status, data: json };
             } catch (error: any) {
               return error as ResponseData;
@@ -164,7 +163,7 @@ export const api = {
             }
           },
 
-          searchProduct: async (type: string, search: string, page: number = 1): Promise<ResponseData> => {
+          searchProduct: async (filters: Record<string, string>, page: number = 1): Promise<ResponseData> => {
             try {
               const token = localStorage.getItem('token') || '';
               const refreshToken = localStorage.getItem('refreshToken') || '';
@@ -175,7 +174,11 @@ export const api = {
                 throw new Error('Invalid token');
               }
           
-              let response = await fetch(`http://127.0.0.1:5000/axiosadmin/gestao/produtos/busca/${type}/${search}?page=${page}`, {
+              let queryParams = new URLSearchParams(filters);
+              queryParams.append("page", page.toString());
+              let url = `http://127.0.0.1:5000/axiosadmin/gestao/produtos/busca_avancada?${queryParams}`;
+          
+              let response = await fetch(url, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -184,7 +187,7 @@ export const api = {
               });
           
               let json = await response.json();
-              
+          
               let products = json.list;
               let paginationInfo = {
                 total: json.total,
@@ -192,8 +195,35 @@ export const api = {
                 page: json.page,
                 per_page: json.per_page
               };
-              
+          
               return { code: response.status, data: {products: products, pagination: paginationInfo}};
+            } catch (error: any) {
+              return error as ResponseData;
+            }
+          },
+
+
+          getAllSectots : async (): Promise<ResponseData> => {
+            try {
+              const token = localStorage.getItem('token') || '';
+              const refreshToken = localStorage.getItem('refreshToken') || '';
+          
+              const authCheckResponse = await api.AuthCheck(token, refreshToken);
+          
+              if (authCheckResponse.code !== 200) {
+                throw new Error('Invalid token');
+              }
+          
+              let response = await fetch('http://127.0.0.1:5000/axiosadmin/list_sectors', {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+
+              let json = await response.json();
+              return { code: response.status, data: json };
             } catch (error: any) {
               return error as ResponseData;
             }

@@ -1,20 +1,21 @@
 import { Card, Container, Row, Form, Col, Button } from "react-bootstrap";
 import { ThemeContext } from "../../../assets/components/NavBar/controls/controlTheme/SwitchContext";
-import { useContext, forwardRef, useState } from "react";
+import { useContext, forwardRef, useState, useEffect } from "react";
 import { NumericFormat } from 'react-number-format';
-import { getErrorMessage, isValidDate, validateQuantity, validateText, validateTextofDescription, valueInput, validateDiferentText, validateBarCode, validateDimensions, valueInputRequired } from "../../../assets/validators/validator";
+import { getErrorMessage, validateQuantity, validateTextofDescription, valueInput, validateDiferentText, validateBarCode, validateDimensions, valueInputRequired, validateSupplierCode, validateWeight } from "../../../assets/validators/validator";
 import { api } from "../../../api/admin/api_admin_products";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from '../../../redux/store';
+import { fetchSelectAllSector } from "../../../redux/reducers/sectorsReducer";
 
 
-interface AdcProdutosProps {
-    sectorList: string[];
-}
 
 const CustomInput = forwardRef((props, ref) => <Form.Control {...props}  />);
 
-export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
+export const AdcProdutos: React.FC = (props) => {
+    const category = useSelector((state: RootState) => state.sectors);
+    const dispatch = useDispatch<AppDispatch>();
     const { isTheme } = useContext(ThemeContext);
-    const { sectorList } = props;
     const [addName, setAddName] = useState('');
     const [addResaleValue, setAddResaleValue] = useState('');
     const [addCust, setAddCust] = useState('');
@@ -41,7 +42,7 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
     const [addSafetyRating, setAddSafetyRating] = useState('');
     const [addShippingRestrictions, setAddShippingRestrictions] = useState(''); 
     const [addSector, setAddSector] = useState('');  
-
+    const [addNewSetorClicked, setAddNewSetorClicked] = useState(false)
     const [errorAddName, setErrorAddName] = useState('');
     const [errorAddResaleValue, setErrorAddResaleValue] = useState('');
     const [errorAddCust, setErrorAddCust] = useState('');
@@ -58,7 +59,7 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
     const [errorAddDimensions, setErrorAddDimensions] = useState('');
     const [errorAddDimenionsUnit, setErrorAddDimenionsUnit] = useState('');
     const [errorAddBarCode, setErrorAddBarCode] = useState('');
-    const [errorAddLastUpdate, setErrorAddLastUpdate] = useState('');
+    const [errorAddLastUpdate, setErrorAddLastUpdate] = useState();
     const [errorAddReorderPoint, setErrorAddReorderPoint] = useState('');
     const [errorAddRestockTime, setErrorAddRestockTime] = useState('');
     const [errorAddWarrantyInfo, setErrorAddWarrantyInfo] = useState('');
@@ -70,6 +71,14 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
     const [errorAddSector, setErrorAddSector] = useState('');
 
 
+    useEffect(() => {
+      dispatch(fetchSelectAllSector());
+    }, [dispatch]);
+    
+
+    const handleAddNewSetorClick = () => {
+      setAddNewSetorClicked(!addNewSetorClicked);
+    };
 
     const handleAddName = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAddName(event.target.value);
@@ -96,7 +105,10 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
       };
     
       const handleAddQuantity = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddQuantity(event.target.value);
+        const input = event.target as HTMLInputElement;
+        const inputValue = input.value.replace(/\D/g, ''); 
+        input.value = inputValue; 
+        setAddQuantity(inputValue);
       };
     
       const handleAddSupplier = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,7 +132,26 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
         };
 
         const handleAddWeight = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddWeight(event.target.value);
+          const input = event.target as HTMLInputElement;
+          let inputValue = input.value;
+        
+          // Remove todos os caracteres que não são dígitos
+          inputValue = inputValue.replace(/[^\d]/g, '');
+        
+          // Divide o valor em parte inteira e decimal
+          const integerPart = inputValue.slice(0, -2);
+          const decimalPart = inputValue.slice(-2);
+        
+          // Verifica se o valor está vazio
+          if (inputValue === '') {
+            setAddWeight('');
+          } else {
+            // Formata o valor adicionando o ponto decimal
+            const formattedValue = `${integerPart}.${decimalPart}`;
+        
+            // Atualiza o estado com o valor formatado
+            setAddWeight(formattedValue);
+          }
         };
 
         const handleAddWeightUnit = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,15 +171,21 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
         };
 
         const handleAddLastUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddLastUpdate(event.target.value);
+          setAddLastUpdate(event.target.value);
         };
 
         const handleAddReorderPoint = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddReorderPoint(event.target.value);
+          const input = event.target as HTMLInputElement;
+          const inputValue = input.value.replace(/\D/g, ''); 
+          input.value = inputValue; 
+          setAddReorderPoint(inputValue);
         };
 
         const handleAddRestockTime = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddRestockTime(event.target.value);
+          const input = event.target as HTMLInputElement;
+          const inputValue = input.value.replace(/\D/g, ''); 
+          input.value = inputValue; 
+          setAddRestockTime(inputValue);
         };
 
         const handleAddWarrantyInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,7 +214,6 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
 
         
         const handleSave = async () => {
-            console.log('teste');
             const productName = document.getElementById('productName') as HTMLInputElement;
             const productPrice = document.getElementById('productResaleValue') as HTMLInputElement;
             const productCust = document.getElementById('productCust') as HTMLInputElement;
@@ -205,8 +241,8 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
             const productSafetyRating = document.getElementById('productSafetyRating') as HTMLInputElement;
             const productShippingRestrictions = document.getElementById('productShippingRestrictions') as HTMLInputElement;
 
-        
-            const verifyProductName = validateDiferentText(productName.value);
+           
+            const verifyProductName = validateDiferentText(productName.value, true, false);
             let nameProductError = '';
           
             if (typeof verifyProductName === 'object' && Object.keys(verifyProductName).length > 0) {
@@ -220,230 +256,283 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
             const verifyProductPrice = valueInputRequired(productPrice.value);
             let priceProductError = '';
             
-            /*PAAAREI AQQUIII */
+            if (typeof verifyProductPrice === 'object' && Object.keys(verifyProductPrice).length > 0) {
+                priceProductError = getErrorMessage(verifyProductPrice);
+                setErrorAddResaleValue(priceProductError);
+            } else {
+              setErrorAddResaleValue('');
+            }
 
 
-            const verifyProductCust = valueInput(productCust.value);
+            const verifyProductCust = valueInputRequired(productCust.value);
             let costProductError = '';
           
-            if (verifyProductCust === false) {
-                costProductError = 'Valor inválido';
-                setErrorAddCust(costProductError)
+            if (typeof verifyProductCust === 'object' && Object.keys(verifyProductCust).length > 0) {
+                costProductError = getErrorMessage(verifyProductCust);
+                setErrorAddCust(costProductError);
             } else {
                 setErrorAddCust('');
             }
           
-          
-            const verifyProductTax = valueInput(productTax.value);
+
             let taxProductError = '';
-          
-            if (verifyProductTax === false) {
-              taxProductError = 'Valor inválido';
-              setErrorAddTax(taxProductError)
+            if (addTax !== '') {
+              const verifyProductTax = valueInput(productTax.value);           
+              if (verifyProductTax === false) {
+                taxProductError = 'Valor inválido';
+                setErrorAddTax(taxProductError)
+              } else {
+                  setErrorAddTax('');
+              }
             } else {
-                setErrorAddTax('');
+              setErrorAddTax('');
             }
+                     
           
-          
-          
-            const verifyProductDiscount = valueInput(productDiscount.value);
+            
             let discountProductError = '';
-          
-            if (verifyProductDiscount === false) {
-                discountProductError = 'Valor inválido';
-                setErrorAddDiscount(discountProductError)
+            if (addDiscount !== '') {
+              const verifyProductDiscount = valueInput(productDiscount.value);         
+              if (verifyProductDiscount === false) {
+                  discountProductError = 'Valor inválido';
+                  setErrorAddDiscount(discountProductError)
+              } else {
+                  setErrorAddDiscount('');
+              }
             } else {
-                setErrorAddDiscount('');
+              setErrorAddDiscount('');
+            }
+
+
+            let supplierCodeError = '';
+            if (addSupplier !== '') {
+              const verifySupplierCode = validateSupplierCode(productSupplierCode.value);
+              if (typeof verifySupplierCode === 'object' && Object.keys(verifySupplierCode).length > 0) {
+                  supplierCodeError = getErrorMessage(verifySupplierCode);
+                  setErrorAddSupplierCode(supplierCodeError);
+              } else {
+                  setErrorAddSupplierCode('');
+              }
+            } else {
+              setErrorAddSupplierCode('');  
             }
           
             
             const verifyProductQuantity = validateQuantity(Number(productQuantity.value));
             let quantityProductError = '';
-          
-            if (verifyProductQuantity === false) {
-                discountProductError = 'Valor inválido';
-                setErrorAddQuantity(quantityProductError)
+            if (typeof verifyProductQuantity === 'object' && Object.keys(verifyProductQuantity).length > 0) {
+                quantityProductError = getErrorMessage(verifyProductQuantity);
+                setErrorAddQuantity(quantityProductError);
             } else {
                 setErrorAddQuantity('');
             }
+            
           
-          
-            const verifyProductSupplier = validateText(productSupplier.value);
+
+
             let supplierProductError = '';
-          
-            if (typeof verifyProductSupplier === 'object' && Object.keys(verifyProductSupplier).length > 0) {
-              supplierProductError = getErrorMessage(verifyProductSupplier);
-              setErrorAddSupplier(supplierProductError)
+            if (addSupplier !== '') { 
+              const verifyProductSupplier = validateDiferentText(addSupplier, false, true);
+              if (typeof verifyProductSupplier === 'object' && Object.keys(verifyProductSupplier).length > 0) {
+                supplierProductError = getErrorMessage(verifyProductSupplier);
+                setErrorAddSupplier(supplierProductError)
+              } else {
+                  setErrorAddSupplier('');
+              }
             } else {
-                setErrorAddSupplier('');
+              setErrorAddSupplier('');
             }
+
+
         
-            const verifyProductSector = validateText(productSectorSelect.value);
-            let supplierSectortError = '';
-          
+            const verifyProductSector = validateDiferentText(productSectorSelect.value, true, true);
+            let supplierSectortError = '';         
             if (typeof verifyProductSector === 'object' && Object.keys(verifyProductSector).length > 0) {
-                supplierProductError = getErrorMessage(verifyProductSector);
+              supplierSectortError = getErrorMessage(verifyProductSector);
                 setErrorAddSector(supplierSectortError)
             } else {
                 setErrorAddSector('');
             }
           
-          
-            const verifyProductDescription = validateTextofDescription(productDescription.value);
+            
             let descriptionProductError = '';
+            if (addDescription !== '') {
+              const verifyProductDescription = validateTextofDescription(productDescription.value);
+              if (typeof verifyProductDescription === 'object' && Object.keys(verifyProductDescription).length > 0) {
+                  descriptionProductError = getErrorMessage(verifyProductDescription);
+                  setErrorAddDescription(descriptionProductError)
+              } else {
+                  setErrorAddDescription('');
+              }
+            } else {
+              setErrorAddDescription('');
+            }
           
             
-            if (typeof verifyProductDescription === 'object' && Object.keys(verifyProductDescription).length > 0) {
-                descriptionProductError = getErrorMessage(verifyProductDescription);
-                setErrorAddDescription(descriptionProductError)
-            } else {
-                setErrorAddDescription('');
-            }
-          
-            const verifyProductDatePurchase = isValidDate(productDatePurchase.value);
-            let datePurchaseProductError = '';
-          
-            if (!verifyProductDatePurchase) {
-                datePurchaseProductError = 'Data inválida';
-                setErrorAddDatePurchase(datePurchaseProductError)
-            } else {
-                setErrorAddDatePurchase('');
-            }
-          
-            const verifyProductManufacturer = validateDiferentText(productManufacturer.value);
             let manufacturerProductError = '';
-
-            if (typeof verifyProductManufacturer === 'object' && Object.keys(verifyProductManufacturer).length > 0) {
-                manufacturerProductError = getErrorMessage(verifyProductManufacturer);
-                setErrorAddManufacturer(manufacturerProductError)
+            if (addManufacturer !== '') {
+              const verifyProductManufacturer = validateDiferentText(productManufacturer.value, false, false);
+              if (typeof verifyProductManufacturer === 'object' && Object.keys(verifyProductManufacturer).length > 0) {
+                  manufacturerProductError = getErrorMessage(verifyProductManufacturer);
+                  setErrorAddManufacturer(manufacturerProductError)
+              } else {
+                  setErrorAddManufacturer('');
+              }
             } else {
-                setErrorAddManufacturer('');
+              setErrorAddManufacturer('');
             }
 
-            const verifyProductWeight = valueInput(productWeight.value);
+
             let weightProductError = '';
-
-            if (verifyProductWeight === false) {
-                weightProductError = 'Valor inválido';
-                setErrorAddWeight(weightProductError)
+            if (addWeight !== '') {
+              const verifyProductWeight = validateWeight(productWeight.value);
+              if (typeof verifyProductWeight === 'object' && Object.keys(verifyProductWeight).length > 0) {
+                  weightProductError = getErrorMessage(verifyProductWeight);
+                  setErrorAddWeight(weightProductError)
+              } else {
+                  setErrorAddWeight('');
+              }
             } else {
-                setErrorAddWeight('');
+              setErrorAddWeight('');
             }
-
            
-            const verifyProductDimensions = validateDimensions(productDimensions.value);
             let dimensionsProductError = '';
-
-            if (typeof verifyProductDimensions === 'object' && Object.keys(verifyProductDimensions).length > 0) {
-                dimensionsProductError = getErrorMessage(verifyProductDimensions);
-                setErrorAddDimensions(dimensionsProductError)
+            if (addDimensions !== '') {
+              const verifyProductDimensions = validateDimensions(productDimensions.value);
+              if (typeof verifyProductDimensions === 'object' && Object.keys(verifyProductDimensions).length > 0) {
+                  dimensionsProductError = getErrorMessage(verifyProductDimensions);
+                  setErrorAddDimensions(dimensionsProductError)
+              } else {
+                  setErrorAddDimensions('');
+              }
             } else {
-                setErrorAddDimensions('');
+              setErrorAddDimensions('');
             }
 
-           
-            const verifyProductBarCode = validateBarCode(productBarCode.value);
+            
+
             let barCodeProductError = '';
-
-            if (typeof verifyProductBarCode === 'object' && Object.keys(verifyProductBarCode).length > 0) {
-                barCodeProductError = getErrorMessage(verifyProductBarCode);
-                setErrorAddBarCode(barCodeProductError)
+            if (addBarCode !== '') {
+              const verifyProductBarCode = validateBarCode(productBarCode.value);
+              if (typeof verifyProductBarCode === 'object' && Object.keys(verifyProductBarCode).length > 0) {
+                  barCodeProductError = getErrorMessage(verifyProductBarCode);
+                  setErrorAddBarCode(barCodeProductError)
+              } else {
+                  setErrorAddBarCode('');
+              }
             } else {
-                setErrorAddBarCode('');
+              setErrorAddBarCode('');
             }
-
-            const verifyProductLastUpdate = isValidDate(productLastUpdate.value);
-            let lastUpdateProductError = '';
-
-            if (!verifyProductLastUpdate) {
-                lastUpdateProductError = 'Data inválida';
-                setErrorAddLastUpdate(lastUpdateProductError)
-            } else {
-                setErrorAddLastUpdate('');
-            }
-
-            const verifyProductReorderPoint = validateQuantity(Number(productReorderPoint.value));
+           
+            
             let reorderPointProductError = '';
-
-            if (verifyProductReorderPoint === false) {
-                reorderPointProductError = 'Valor inválido';
-                setErrorAddReorderPoint(reorderPointProductError)   
+            if (addReorderPoint !== '') {
+            const verifyProductReorderPoint = validateQuantity(Number(productReorderPoint.value));
+            if (typeof verifyProductReorderPoint === 'object' && Object.keys(verifyProductReorderPoint).length > 0) {
+                reorderPointProductError = getErrorMessage(verifyProductReorderPoint);
+                setErrorAddReorderPoint(reorderPointProductError)
             } else {
                 setErrorAddReorderPoint('');
             }
+            } else {
+              setErrorAddReorderPoint('');
+            }
 
-            const verifyProductRestockTime = validateQuantity(Number(productRestockTime.value));
+
+
             let restockTimeProductError = '';
-
-            if (verifyProductRestockTime === false) {
-                restockTimeProductError = 'Valor inválido';
-                setErrorAddRestockTime(restockTimeProductError)
+            if (addRestockTime !== '') {
+              const verifyProductRestockTime = validateQuantity(Number(productRestockTime.value));
+              if (typeof verifyProductRestockTime === 'object' && Object.keys(verifyProductRestockTime).length > 0) {
+                  restockTimeProductError = getErrorMessage(verifyProductRestockTime);
+                  setErrorAddRestockTime(restockTimeProductError)
+              } else {
+                  setErrorAddRestockTime('');
+              }
             } else {
-                setErrorAddRestockTime('');
+              setErrorAddRestockTime('');
             }
 
-            const verifyProductWarrantyInfo = validateText(productWarrantyInfo.value);
+
+
             let warrantyInfoProductError = '';
-
-            if (typeof verifyProductWarrantyInfo === 'object' && Object.keys(verifyProductWarrantyInfo).length > 0) {
-                warrantyInfoProductError = getErrorMessage(verifyProductWarrantyInfo);
-                setErrorAddWarrantyInfo(warrantyInfoProductError)
-            } else {
-                setErrorAddWarrantyInfo('');
+            if (addWarrantyInfo !== '') {
+              const verifyProductWarrantyInfo = validateDiferentText(productWarrantyInfo.value, false, true);
+              if (typeof verifyProductWarrantyInfo === 'object' && Object.keys(verifyProductWarrantyInfo).length > 0) {
+                  warrantyInfoProductError = getErrorMessage(verifyProductWarrantyInfo);
+                  setErrorAddWarrantyInfo(warrantyInfoProductError)
+              } else {
+                  setErrorAddWarrantyInfo('');
+              }
+            }
+            else {
+              setErrorAddWarrantyInfo('');
             }
 
-            const verifyProductBatchInfo = validateText(productBatchInfo.value);
+
             let batchInfoProductError = '';
-
-            if (typeof verifyProductBatchInfo === 'object' && Object.keys(verifyProductBatchInfo).length > 0) {
-                batchInfoProductError = getErrorMessage(verifyProductBatchInfo);
-                setErrorAddBatchInfo(batchInfoProductError)
+              if (addBatchInfo !== '') {
+              const verifyProductBatchInfo = validateDiferentText(productBatchInfo.value, false, true);
+              if (typeof verifyProductBatchInfo === 'object' && Object.keys(verifyProductBatchInfo).length > 0) {
+                  batchInfoProductError = getErrorMessage(verifyProductBatchInfo);
+                  setErrorAddBatchInfo(batchInfoProductError)
+              } else {
+                  setErrorAddBatchInfo('');
+              }
             } else {
-                setErrorAddBatchInfo('');
+              setErrorAddBatchInfo('');
             }
 
-            const verifyProductExpireDate = isValidDate(productExpireDate.value);
-            let expireDateProductError = '';
 
-            if (!verifyProductExpireDate) {
-                expireDateProductError = 'Data inválida';
-                setErrorAddExpireDate(expireDateProductError)
-            } else {
-                setErrorAddExpireDate('');
-            }
 
-            const verifyMaterialOrIngredients = validateDiferentText(productMaterialOrIngredients.value);
             let materialOrIngredientsProductError = '';
+            if (addMaterialOrIngredients !== '') {
+              const verifyMaterialOrIngredients = validateDiferentText(productMaterialOrIngredients.value, false, false);
 
-            if (typeof verifyMaterialOrIngredients === 'object' && Object.keys(verifyMaterialOrIngredients).length > 0) {
-                materialOrIngredientsProductError = getErrorMessage(verifyMaterialOrIngredients);
-                setErrorAddMaterialOrIngredients(materialOrIngredientsProductError)
+              if (typeof verifyMaterialOrIngredients === 'object' && Object.keys(verifyMaterialOrIngredients).length > 0) {
+                  materialOrIngredientsProductError = getErrorMessage(verifyMaterialOrIngredients);
+                  setErrorAddMaterialOrIngredients(materialOrIngredientsProductError)
+              } else {
+                  setErrorAddMaterialOrIngredients('');
+              }
             } else {
-                setErrorAddMaterialOrIngredients('');
+              setErrorAddMaterialOrIngredients('');
             }
-            
-            const verifyProductSafetyRating = validateDiferentText(productSafetyRating.value);
+
+
             let safetyRatingProductError = '';
+            if (addSafetyRating !== '') {
+              const verifyProductSafetyRating = validateDiferentText(productSafetyRating.value, false, false);
 
-            if (typeof verifyProductSafetyRating === 'object' && Object.keys(verifyProductSafetyRating).length > 0) {
-                safetyRatingProductError = getErrorMessage(verifyProductSafetyRating);
-                setErrorAddSafetyRating(safetyRatingProductError)
-            } else {
-                setErrorAddSafetyRating('');
+              if (typeof verifyProductSafetyRating === 'object' && Object.keys(verifyProductSafetyRating).length > 0) {
+                  safetyRatingProductError = getErrorMessage(verifyProductSafetyRating);
+                  setErrorAddSafetyRating(safetyRatingProductError)
+              } else {
+                  setErrorAddSafetyRating('');
+              }
             }
-            
-            const verifyProductShippingRestrictions = validateDiferentText(productShippingRestrictions.value);
+            else {
+              setErrorAddSafetyRating('');
+            }
+  
+
             let shippingRestrictionsProductError = '';
+            if (addShippingRestrictions !== '') {
+              const verifyProductShippingRestrictions = validateDiferentText(productShippingRestrictions.value, false, false);
 
-            if (typeof verifyProductShippingRestrictions === 'object' && Object.keys(verifyProductShippingRestrictions).length > 0) {
-                shippingRestrictionsProductError = getErrorMessage(verifyProductShippingRestrictions);
-                setErrorAddShippingRestrictions(shippingRestrictionsProductError)
+              if (typeof verifyProductShippingRestrictions === 'object' && Object.keys(verifyProductShippingRestrictions).length > 0) {
+                  shippingRestrictionsProductError = getErrorMessage(verifyProductShippingRestrictions);
+                  setErrorAddShippingRestrictions(shippingRestrictionsProductError)
+              } else {
+                  setErrorAddShippingRestrictions('');
+              }
             } else {
-                setErrorAddShippingRestrictions('');
+              setErrorAddShippingRestrictions('');
             }
 
-          
-            if (!nameProductError && !priceProductError && !costProductError && !taxProductError && !discountProductError && !quantityProductError && !supplierProductError && !descriptionProductError && !datePurchaseProductError && !supplierSectortError && !manufacturerProductError && !weightProductError && !dimensionsProductError && !barCodeProductError && !lastUpdateProductError && !reorderPointProductError && !restockTimeProductError && !warrantyInfoProductError && !batchInfoProductError && !expireDateProductError && !materialOrIngredientsProductError && !safetyRatingProductError && !shippingRestrictionsProductError) {
+    
+         
+            if (!nameProductError && !priceProductError && !costProductError && !taxProductError && !discountProductError && !quantityProductError && !supplierProductError && !descriptionProductError  && !supplierSectortError && !manufacturerProductError && !weightProductError && !dimensionsProductError && !barCodeProductError  && !restockTimeProductError && !warrantyInfoProductError && !batchInfoProductError && !materialOrIngredientsProductError && !safetyRatingProductError && !shippingRestrictionsProductError) {
               const product = {
                 prodName: productName.value,
                 valueResale: Number(Number(productPrice.value.replace('R$', '').replace('.', '').replace(',', '.')).toFixed(1)),
@@ -472,7 +561,6 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                 safetyRating: productSafetyRating.value,
                 shippingRestrictions: productShippingRestrictions.value,
               };
-              console.log(product);
               let response = await api.registerProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase, product.sector, product.supplierCode, product.manufacturer, product.weight, product.weightUnit, product.dimensions, product.dimensionsUnit, product.barCode, product.lastUpdate, product.reorderPoint, product.restockTime, product.warrantyInfo, product.batchInfo, product.expireDate, product.materialOrIngredients, product.safetyRating, product.shippingRestrictions);
               if (response.code === 200 || response.code === 201) {
                 alert('Produto cadastrado com sucesso!');
@@ -528,7 +616,7 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                             <Col lg={2}>
                               <Form.Group controlId="productTax">
                                 <Form.Label>Imposto</Form.Label>
-                                <NumericFormat suffix={'%'} decimalSeparator={','} decimalScale={2} fixedDecimalScale={true} required value={addTax} onChange={handleAddTax} customInput={CustomInput}/>
+                                <NumericFormat suffix={'%'} decimalSeparator={','} decimalScale={2} fixedDecimalScale={true} value={addTax} onChange={handleAddTax} customInput={CustomInput}/>
                                 <p className="errorInfo">{errorAddTax}</p>
                               </Form.Group>
                             </Col>
@@ -544,11 +632,25 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                             <Col lg={2}>
                               <Form.Group controlId="setorSelect">
                                 <Form.Label>Categoria</Form.Label>
-                                <Form.Control type="text" maxLength={100} value={addSector} onChange={handleAddSector} />
-                                <p className="errorInfo">{errorAddSector}</p>
+                                {addNewSetorClicked || category.sectors.length === 0 ? (<Form.Control type="text" />) : (
+                                  <Form.Select>
+                                    {category.sectors.map((sector) => (
+                                      <option key={sector} value={sector}>{sector}
+                                      </option>
+                                    ))}
+                                  </Form.Select>
+                                )}
                               </Form.Group>
+      
                             </Col>
-                            <Col lg={3}>
+                              {category.sectors.length > 0 && (
+                                <Col lg={1}>
+                                 <Button className="addNewSetor" variant="primary" type="button" size="sm" onClick={handleAddNewSetorClick}>
+                                 {addNewSetorClicked ? '-' : '+'}
+                               </Button>
+                             </Col>
+                              )}
+                            <Col lg={2}>
                               <Form.Group controlId="productSupplier">
                                 <Form.Label>Fornecedor</Form.Label>
                                 <Form.Control type="text" maxLength={100} value={addSupplier} onChange={handleAddSupplier} />
@@ -574,7 +676,13 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                             <Col lg={2}>
                               <Form.Group controlId="productQuantity">
                                 <Form.Label>Quantidade</Form.Label>
-                                <Form.Control type="number" min="0" required value={addQuantity} onChange={handleAddQuantity} />
+                                <Form.Control  
+                                  type="text"
+                                  pattern="[0-9]*"
+                                  inputMode="numeric"
+                                  required
+                                  value={addQuantity}
+                                  onInput={handleAddQuantity} />
                                 <p className="errorInfo">{errorAddQuantity}</p>
                               </Form.Group>
                             </Col>
@@ -582,28 +690,36 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                               <Form.Group controlId="productDatePurchase">
                                 <Form.Label>Data da compra</Form.Label>
                                 <Form.Control type="date" required value={addDatePurchase} onChange={handleAddDatePurchase} />
-                                <p className="errorInfo">{errorAddDatePurchase}</p>
                               </Form.Group>
                             </Col>
                             <Col lg={2}>
                               <Form.Group controlId="productReorderPoint">
                                 <Form.Label>Ponto de reordenação</Form.Label>
-                                <Form.Control type="number" min="0" value={addReorderPoint} onChange={handleAddReorderPoint} />
+                                <Form.Control
+                                    type="text"
+                                    pattern="[0-9]*"
+                                    inputMode="numeric"
+                                    value={addReorderPoint}
+                                    onChange={handleAddReorderPoint}
+                                  />
                                 <p className="errorInfo">{errorAddReorderPoint}</p>
                               </Form.Group>
                             </Col>
                             <Col lg={2}>
                               <Form.Group controlId="productRestockTime">
                                 <Form.Label>Tempo de reposição</Form.Label>
-                                <Form.Control type="number" min="0" value={addRestockTime} onChange={handleAddRestockTime} />
+                                <Form.Control 
+                                    type="text"
+                                    pattern="[0-9]*"
+                                    inputMode="numeric" value={addRestockTime} 
+                                    onChange={handleAddRestockTime} />
                                 <p className="errorInfo">{errorAddRestockTime}</p>
                               </Form.Group>
                             </Col>
                             <Col lg={3}>
                               <Form.Group controlId="productLastUpdate">
                                 <Form.Label>Ultima atualização</Form.Label>
-                                <Form.Control type="date" required value={addLastUpdate} onChange={handleAddLastUpdate} />
-                                <p className="errorInfo">{errorAddLastUpdate}</p>
+                                <Form.Control type="date" value={addLastUpdate} onChange={handleAddLastUpdate} />
                               </Form.Group>
                             </Col>
                           </Row>
@@ -626,7 +742,6 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                                     <Form.Group controlId="productExpireDate">
                                         <Form.Label>Data de validade</Form.Label>
                                         <Form.Control type="date" value={addExpireDate} onChange={handleAddExpireDate} />
-                                        <p className="errorInfo">{errorAddExpireDate}</p>
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -634,7 +749,11 @@ export const AdcProdutos: React.FC<AdcProdutosProps> = (props) => {
                                 <Col lg={3}>
                                     <Form.Group controlId="productWeight">
                                         <Form.Label>Peso</Form.Label>
-                                        <Form.Control type="number" min="0" value={addWeight} onChange={handleAddWeight} />
+                                        <Form.Control
+                                              type="text"
+                                              value={addWeight}
+                                              onChange={handleAddWeight}
+                                            />
                                         <p className="errorInfo">{errorAddWeight}</p>
                                     </Form.Group>
                                 </Col>

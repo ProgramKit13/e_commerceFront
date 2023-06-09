@@ -1,7 +1,6 @@
 import { Container, Row, Col, Card, Table, Form, Button } from 'react-bootstrap';
 import DataTableBody from './components/DataTableBody';
 import { MdAddCircle } from 'react-icons/md';
-import { validateText, getErrorMessage, valueInput, validateQuantity, validateTextofDescription, isValidDate } from '../../../assets/validators/validator';
 import { api } from '../../../api/admin/api_admin_products';
 import { useInterceptResponseFormContext  } from '../../../assets/components/Gestao/interceptResponseForm';
 import { useContext, useEffect, useState, ChangeEvent } from 'react';
@@ -10,10 +9,7 @@ import AdvancedPagination from '../../../assets/components/Gestao/Pagination.Def
 import { ThemeContext } from '../../../assets/components/NavBar/controls/controlTheme/SwitchContext';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { FormFilter } from './components/FormFilter';
-import { Routes, Route, Link } from 'react-router-dom';
-import AdcProdutos from './AdcProdutos';
-
-
+import {  Link } from 'react-router-dom';
 
 
 export const Produtos  = () => {
@@ -33,7 +29,7 @@ export const Produtos  = () => {
     per_page: 50
   });
   const [selectedValue, setSelectedValue] = useState(paginationData.per_page);
-
+  
 
   const fetchData = async () => {
     const inputElement = document.getElementById('searchProduct') as HTMLInputElement;
@@ -51,17 +47,20 @@ export const Produtos  = () => {
       setEnumProduct(enumProduct);
       setTotalProducts(totalProducts);
       setSectorList(sectorsList);
-      console.log(sectorList)
+
       const productList = listAllProducts.data.products.list.map((product: any) => {
         return {
           token: product.token,
           produto: product.prodName,
-          vRevenda: product.valueResale,
           vCusto: product.valueResale,
-          mDesc: product.discount,
+          vRevenda: product.valueResale,
+          mDisc: product.discount,
+          vImpos: product.tax,
           qt: product.qt,
+          reposicao: product.restockTime,
           fornecedor: product.supplier,
-          setor: product.sector
+          setor: product.sector,
+          cod: product.barcode,
         };
       });
       setProductList(productList);
@@ -75,26 +74,30 @@ export const Produtos  = () => {
     try {
       const inputElement = document.getElementById('searchProduct') as HTMLInputElement;
       const inputElementSearch = document.getElementById('filterSearch') as HTMLInputElement;
-      if (inputElement) {
+      if (inputElement && inputElementSearch) {
         const searchValue = inputElement.value;
-        const typeSearch = inputElementSearch.value;
+        const filterField = inputElementSearch.value;
         if (searchValue === "") {
           fetchData();
           return;
         }
-        const searchProduct = await api.searchProduct(typeSearch, searchValue);
+        const filters = { [filterField]: searchValue };
+        const searchProduct = await api.searchProduct(filters);
         if (searchProduct.code === 200) {
           const totalProducts = searchProduct.data.pagination.total;
           const productList = searchProduct.data.products.map((product: any) => {
             return {
               token: product.token,
               produto: product.prodName,
-              vRevenda: product.valueResale,
               vCusto: product.valueResale,
-              mDesc: product.discount,
+              vRevenda: product.valueResale,
+              mDisc: product.discount,
+              vImpos: product.tax,
               qt: product.qt,
+              reposicao: product.restockTime,
               fornecedor: product.supplier,
-              setor: product.sector
+              setor: product.sector,
+              cod: product.barcode,
             };
           });
           setProductList(productList);
@@ -108,34 +111,8 @@ export const Produtos  = () => {
     } catch (error) {
       console.error('Failed to search product:', error);
     }
-        
   };
   
-  
-  const handleQtProd = async (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectEnumListProd = parseInt(event.target.value);
-  
-    if (isNaN(selectEnumListProd)) {
-      console.error('Valor impossível de ser convertido');
-      return;
-    }
-  
-    const updateEnumProd = await api.updatePerPageProductsEnum(selectEnumListProd);
-    setSelectedValue(selectEnumListProd);
-  
-  
-    if (
-      selectEnumListProd < paginationData.per_page &&
-      selectEnumListProd < paginationData.total
-    ) {
-      setPaginationData(prevState => ({ ...prevState, page: 1 }));
-    }
-  
-  
-    if (selectEnumListProd > paginationData.per_page) {
-      setPaginationData(prevState => ({ ...prevState, page: 1 }));
-    }
-  };
 
 
   const handleFilter = async (event: ChangeEvent<HTMLSelectElement>) => {
@@ -194,45 +171,11 @@ export const Produtos  = () => {
             <Card bg={`${isTheme ? 'dark' : 'white'}`} className="shadow">
               <Card.Header className="py-2 alignCardHeader">
                 <Row>
-                    <Col lg={3}>
-                    <Form.Group className="mb-3" controlId="formFilterSearch">
-                        <Form.Label>Filtro de busca</Form.Label>
-                        <Form.Select aria-label="Filtro de busca" id='filterSearch' defaultValue="nome">
-                          <option value="nome">Nome</option>
-                          <option value="fornecedor">Fornecedor</option>
-                          <option value="setor">Categoria</option>
-                          <option value="descricao">Descrição</option>
-                        </Form.Select>
-                    </Form.Group>
-                    </Col>
-                    <Col lg={5}>
-                        <Form.Label>Buscar</Form.Label>
-                        <InputGroup>
-                          <Form.Control type="text" placeholder="Procurar por produto" aria-describedby="buttonSearch" id='searchProduct'/>
-                          <InputGroup.Text id="buttonSearch" onClick={handleSearch}>?</InputGroup.Text>
-                        </InputGroup>
-                    </Col>
-                  <Col lg={2} className='formQtList'>
-                    <Form.Label>Quantidade</Form.Label>
-                    <Form.Select 
-                          aria-label="qtList" 
-                          onChange={handleQtProd}
-                          value={selectedValue}>
-                          {enumProduct.map((value, index) => (
-                              <option key={index} value={value}>{value}</option>
-                          ))}
-                    </Form.Select>
-                  </Col>
-                  <Col lg={2} className='toPageAddProduct'>
-                    <Link className='btnAddProduct' to="adicionarprodutos">Adicioanr Produto</Link>
-                  </Col>                  
-                </Row>
-                <Row>
-                  <FormFilter/>
+                  <FormFilter enumProduct={enumProduct} />
                 </Row>
                 <Row>
                   <Col sm={3}>
-                    <Button variant="outline-secondary" className='btnFilter'>
+                    <Button variant="outline-secondary" className='btnFilter mt-3' onClick={handleSearch}  >
                       Filtrar
                     </Button>
                   </Col>
@@ -246,13 +189,13 @@ export const Produtos  = () => {
                         <th>Produto</th>
                         <th>Custo</th>
                         <th>Revenda</th>
+                        <th>Desconto</th>
                         <th>Imposto</th>
                         <th>Quantidade</th>
-                        <th>Unidade Medida</th>
+                        <th>Reposição</th>
                         <th>Fornecedor</th>
                         <th>Categoria</th>
-                        <th>COD</th>
-                        <th>Status</th>
+                        <th>Cod</th>
                       </tr>
                     </thead>
                     <DataTableBody data={productList} />

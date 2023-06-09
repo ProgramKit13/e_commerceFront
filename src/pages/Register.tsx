@@ -7,7 +7,7 @@ import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import {api} from '../api/admin/api_admin_user';
-import { validateText, getErrorMessage,  emailValidate, pass_validate, confirm_pass} from '../assets/validators/validator'
+import { validateDiferentText, getErrorMessage,  emailValidate, pass_validate, confirm_pass} from '../assets/validators/validator'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faFacebookSquare, faTelegram, faWhatsappSquare } from '@fortawesome/free-brands-svg-icons';
 
@@ -49,7 +49,7 @@ export const Register = () => {
 
 
     const handleAddUser = async () => {
-        const verifyName = validateText(addName);
+        const verifyName = validateDiferentText(addName, true, true);
         let nameError = '';
 
         if (typeof verifyName === 'object' && Object.keys(verifyName).length > 0) {
