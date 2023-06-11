@@ -15,3 +15,4 @@ Um e-commerce pronto com backend api restfull e Machine Learning em Python, fron
 - `npm install react-router-dom`
 - `npm install react-bootstrap bootstrap`
 - `npm install react-icons --save`
+

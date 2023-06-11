@@ -6,15 +6,18 @@ import {RootState, AppDispatch} from "../../../../redux/store"
 import { useDispatch } from "react-redux";
 import { NumericFormat } from "react-number-format";
 import { Link } from "react-router-dom";
+import { api } from "../../../../api/admin/api_admin_user";
 
 interface FormFilterProps {
-    enumProduct: any; // substitua "any" pelo tipo correto
+    enumProduct: any; 
+    fetchData: () => Promise<void>; 
   }
+
 
 
 const CustomInput = forwardRef((props, ref) => <Form.Control {...props}  />);
 
-export const FormFilter: React.FC<FormFilterProps> = ({ enumProduct }) => {
+export const FormFilter: React.FC<FormFilterProps> = ({ enumProduct, fetchData }) => {
     const category = useSelector((state: RootState) => state.sectors);
     
     const dispatch = useDispatch<AppDispatch>();
@@ -108,11 +111,15 @@ export const FormFilter: React.FC<FormFilterProps> = ({ enumProduct }) => {
     
     const handleQtProd = async (event: ChangeEvent<HTMLSelectElement>) => {
         const selectEnumListProd = parseInt(event.target.value);
+        const updateQtPerPage = await api.updatePerPageProductsEnum(selectEnumListProd);
+        fetchData();
+        setSelectedValue(selectEnumListProd);
         if (isNaN(selectEnumListProd)) {
           console.error('Valor impossível de ser convertido');
           return;
         }
       };
+      
 
       
     return (
