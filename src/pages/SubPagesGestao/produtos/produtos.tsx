@@ -27,7 +27,7 @@ interface Product {
 }
 
 export const Produtos  = () => {
-
+  const [loading, setLoading] = useState(true);
   const { confirm, interceptResponseForm } = useInterceptResponseFormContext();
   const { isTheme } = useContext(ThemeContext);
   const [productList, setProductList] = useState([]);
@@ -54,6 +54,7 @@ export const Produtos  = () => {
   const [getMaterialOrIngredients, setGetMaterialOrIngredients] = useState(''); 
   const [getSafetyRating, setGetSafetyRating] = useState('');
   const [getShippingRestrictions, setGetShippingRestrictions] = useState(''); 
+  const [activeFilters, setActiveFilters] = useState<{ [key: string]: string | number } | null>(null);
 
   const mapProductData = (product: Product) => ({
     token: product.token,
@@ -66,18 +67,18 @@ export const Produtos  = () => {
     reposicao: product.restockTime,
     fornecedor: product.supplier,
     setor: product.sector,
-    cod: product.barcode,
+    cod: product.barcode
   });
 
   const fetchData = async (filters?: { [key: string]: any }, page: number = paginationData.page) => {
+    setLoading(true);
     const response = await api.getAndSearchProducts(filters, page);
-    console.log('fetch',response)
-    const enumProduct = await api.getEnumPerPageProducts();
-    setEnumProduct(enumProduct.data.enumValues);
+    const getEnumProduct = await api.getEnumPerPageProducts();
+    setEnumProduct(getEnumProduct.data.enumValues);
     if (response.code === 200) {
       const { products, pagination } = response.data;
       const updatedProductList = products.map(mapProductData);
-   
+      setSelectedValue(pagination.per_page);
       setProductList(updatedProductList);
       setPaginationData({
         ...paginationData,
@@ -87,8 +88,9 @@ export const Produtos  = () => {
         per_page: pagination.per_page,
       });
     } else {
-      console.log('Erro ao obter os produtos');
+      alert('Produto não encontrado.');
     }
+    setLoading(false);
   };
 
   const formatNumber = (value: string): number => {
@@ -105,7 +107,7 @@ const handleSearch = async () => {
     const searchValue = inputElement.value;
     const filterField = inputElementSearch.value;
 
-    const filters: { [key: string]: string | number } = {
+    const filters: { [key: string]: string | number} = {
       [filterField]: searchValue,
     };
 
@@ -139,63 +141,94 @@ const handleSearch = async () => {
     if (getShippingRestrictions !== '') {
       filters.shippingRestrictions = getShippingRestrictions;
     }
-
+    setActiveFilters(filters);
     fetchData(filters);
   } else {
     alert('Produto não encontrado.');
   }
 };
 
-  const handleQtProd = async (event: ChangeEvent<HTMLSelectElement>) => {
+const handleClearSearch = async () => {
+  const inputElement = document.getElementById('searchProduct') as HTMLInputElement;
+  const inputElementSearch = document.getElementById('filterSearch') as HTMLInputElement;
+  if (inputElement && inputElementSearch) {
+    inputElement.value = '';
+    inputElementSearch.value = 'nome';
+    setGetCust('');
+    setGetResaleValue('');
+    setGetTax('');
+    setGetQuantity('');
+    setGetRestockTime('');
+    setGetSupplierCode('');
+    setGetReorderPoint('');
+    setGetMaterialOrIngredients('');
+    setGetSafetyRating('');
+    setGetShippingRestrictions('');
+    setActiveFilters(null);
+    fetchData();
+  } 
+};
+
+const handleQtProd = async (event: ChangeEvent<HTMLSelectElement>) => {
     const selectEnumListProd = parseInt(event.target.value);
     const updateQtPerPage = await api.updatePerPageProductsEnum(selectEnumListProd);
     if (updateQtPerPage.code === 200) {
       setPaginationData(prevState => ({
         ...prevState, 
         per_page: selectEnumListProd, 
-        page: selectEnumListProd > prevState.total ? 1 : prevState.page
+        page: 1
       }));
+      setSelectedValue(selectEnumListProd);
+  
+      if (activeFilters) {
+         await fetchData(activeFilters, 1);
+      } else {
+         await fetchData(undefined, 1);
+      }
     } else {
-      console.log('Erro ao obter os produtos');
+      alert('Erro ao obter os produtos');
     }
   };
+
+  useEffect(() => {
+    fetchData(activeFilters || {}, paginationData.page);
+  }, [paginationData.page, selectedValue, paginationData.per_page]);
 
 
   const handleNext = () => {
     if (paginationData.page < paginationData.pages) {
-      setPaginationData(prevState => ({...prevState, page: prevState.page + 1}));
+      const newPage = paginationData.page + 1;
+      setPaginationData({...paginationData, page: newPage});
+      if (activeFilters) {
+        fetchData(activeFilters, newPage);
+      }
     }
   };
 
   const handlePrev = () => {
     if (paginationData.page > 1) {
-      setPaginationData(prevState => ({...prevState, page: prevState.page - 1}));
+      const newPage = paginationData.page - 1;
+      setPaginationData({...paginationData, page: newPage});
+      if (activeFilters) {
+        fetchData(activeFilters, newPage);
+      }
     }
   };
-
-  const handleFirst = () => {
-    setPaginationData(prevState => ({...prevState, page: 1}));
-  };
-
-  const handleLast = () => {
-    setPaginationData(prevState => ({...prevState, page: paginationData.pages}));
-  };
-
-
-  useEffect(() => {
-    handleSearch();
-  }, [paginationData.page, paginationData.per_page]);
-
-  useEffect(() => {
-    fetchData();
-  }, [paginationData.page, selectedValue, paginationData.per_page]);
-
-  useEffect(() => {
-    fetchData();
-    setSelectedValue(paginationData.per_page);
-  }, [paginationData.per_page]);
-
   
+  const handleFirst = () => {
+    setPaginationData({...paginationData, page: 1});
+    if (activeFilters) {
+      fetchData(activeFilters, 1);
+    }
+  };
+  
+  const handleLast = () => {
+    const lastPage = paginationData.pages;
+    setPaginationData({...paginationData, page: lastPage});
+    if (activeFilters) {
+      fetchData(activeFilters, lastPage);
+    }
+  };
 
 
   const handleGetCust = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -404,13 +437,22 @@ const handleSearch = async () => {
                 </Row>
             </Form>
                 <Row>
-                  <Col sm={3}>
+                  <Col sm={1}>
                     <Button variant="outline-secondary" className='btnFilter mt-3' onClick={handleSearch}  >
                       Filtrar
                     </Button>
                   </Col>
+                  <Col sm={1}>
+                    <Button variant="outline-secondary" className='btnFilter mt-3' onClick={handleClearSearch}  >
+                      Limpar
+                    </Button>
+                  </Col>
                 </Row>            
               </Card.Header>
+            {loading ? (
+              <div className='loading'>Loading</div>
+            ) : (
+              <div>
               <Card.Body>
                 <div className="table-responsive table mb-0 pt-3 pe-2 tableProdResponse">
                   <Table className={`table-striped table-hover ${isTheme ? 'table-dark' : ''} table-sm my-0 mydatatable`}>
@@ -429,7 +471,7 @@ const handleSearch = async () => {
                       </tr>
                     </thead>
                     <DataTableBody data={productList} />
-                  </Table>
+                  </Table>              
                 </div>
               </Card.Body>
               <Card.Footer className='cardFooterProducts'>
@@ -452,12 +494,14 @@ const handleSearch = async () => {
                   </Col>
                 </Row>
               </Card.Footer>
+              </div>
+            )}
             </Card>
           </Col>
         </Row>
 
       </Container>
     </section>
-        </>
+       </>
     )
 }

@@ -1,46 +1,80 @@
 import { Card, Container, Row, Form, Col, Button } from "react-bootstrap";
-import { ThemeContext } from "../../../assets/components/NavBar/controls/controlTheme/SwitchContext";
+import { ThemeContext } from "../../../../assets/components/NavBar/controls/controlTheme/SwitchContext";
 import { useContext, forwardRef, useState, useEffect } from "react";
 import { NumericFormat } from 'react-number-format';
-import { getErrorMessage, validateQuantity, validateTextofDescription, valueInput, validateDiferentText, validateBarCode, validateDimensions, valueInputRequired, validateSupplierCode, validateWeight } from "../../../assets/validators/validator";
-import { api } from "../../../api/admin/api_admin_products";
+import { getErrorMessage, validateQuantity, validateTextofDescription, valueInput, validateDiferentText, validateBarCode, validateDimensions, valueInputRequired, validateSupplierCode, validateWeight } from "../../../../assets/validators/validator";
+import { api } from "../../../../api/admin/api_admin_products";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchSelectAllSector } from "../../../redux/reducers/sectorsReducer";
+import { RootState, AppDispatch } from '../../../../redux/store';
+import { fetchSelectAllSector } from "../../../../redux/reducers/sectorsReducer";
 
+interface ProductData {
+  prodName?: string; 
+  description?: string;
+  sector?: string;
+  supplier?: string;
+  supplierCode?: string;
+  barcode?: string;
+  weight?: string;
+  weightUnit?: string;
+  dimensions?: string;
+  dimensionsUnit?: string;
+  manufacturer?: string;
+  datePurchase?: string;
+  qt?: string;
+  cust?: string;
+  valueResale?: string;
+  tax?: string;
+  discount?: string;
+  token?: string; 
+  lastUpdated?: string;
+  reorderPoint?: string;
+  restockTime?: string;
+  warrantyInfo?: string;
+  batchInfo?: string;
+  expirtDate?: string;
+  materialOrIngredients?: string;
+  safetyRating?: string;
+  shippingRestrictions?: string;
+}
 
+interface DataProductsProps {
+  productData?: ProductData; // ProductData agora é um objeto com um campo opcional 'prodName'
+}
 
 const CustomInput = forwardRef((props, ref) => <Form.Control {...props}  />);
 
-export const AdcProdutos: React.FC = (props) => {
+export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
     const category = useSelector((state: RootState) => state.sectors);
     const dispatch = useDispatch<AppDispatch>();
     const { isTheme } = useContext(ThemeContext);
-    const [addName, setAddName] = useState('');
-    const [addResaleValue, setAddResaleValue] = useState('');
-    const [addCust, setAddCust] = useState('');
-    const [addTax, setAddTax] = useState('');
-    const [addDiscount, setAddDiscount] = useState('');
-    const [addQuantity, setAddQuantity] = useState('');
-    const [addSupplier, setAddSupplier] = useState('');
-    const [addSupplierCode, setAddSupplierCode] = useState('');
-    const [addDescription, setAddDescription] = useState('');
-    const [addDatePurchase, setAddDatePurchase] = useState(''); 
-    const [addManufacturer, setAddManufacturer] = useState(''); 
-    const [addWeight, setAddWeight] = useState(''); 
-    const [addWeightUnit, setAddWeightUnit] = useState(''); 
-    const [addDimensions, setAddDimensios] = useState('');
-    const [addDimeniosnUnit, setAddDimenionsUnit] = useState('');  
-    const [addBarCode, setAddBarCode] = useState(''); 
-    const [addLastUpdate, setAddLastUpdate] = useState(''); 
-    const [addReorderPoint, setAddReorderPoint] = useState('');
-    const [addRestockTime, setAddRestockTime] = useState('');
-    const [addWarrantyInfo, setAddWarrantyInfo] = useState(''); 
-    const [addBatchInfo, setAddBatchInfo] = useState('');
-    const [addExpireDate, setAddExpireDate] = useState('');
-    const [addMaterialOrIngredients, setAddMaterialOrIngredients] = useState(''); 
-    const [addSafetyRating, setAddSafetyRating] = useState('');
-    const [addShippingRestrictions, setAddShippingRestrictions] = useState(''); 
+
+
+    const [addName, setAddName] = useState(productData?.prodName ?? '');
+    const [addResaleValue, setAddResaleValue] = useState(productData?.valueResale ?? '');
+    const [addCust, setAddCust] = useState(productData?.cust ?? '');
+    const [addTax, setAddTax] = useState(productData?.tax ?? '');
+    const [addDiscount, setAddDiscount] = useState(productData?.discount ?? '');
+    const [addQuantity, setAddQuantity] = useState(productData?.qt ?? '');
+    const [addSupplier, setAddSupplier] = useState(productData?.supplier ?? '');
+    const [addSupplierCode, setAddSupplierCode] = useState(productData?.supplierCode ?? '');
+    const [addDescription, setAddDescription] = useState(productData?.description ?? '');
+    const [addDatePurchase, setAddDatePurchase] = useState(productData?.datePurchase ?? ''); 
+    const [addManufacturer, setAddManufacturer] = useState(productData?.manufacturer ?? ''); 
+    const [addWeight, setAddWeight] = useState(productData?.weight ?? ''); 
+    const [addWeightUnit, setAddWeightUnit] = useState(productData?.weightUnit ?? ''); 
+    const [addDimensions, setAddDimensios] = useState(productData?.dimensions ?? '');
+    const [addDimeniosnUnit, setAddDimenionsUnit] = useState(productData?.dimensionsUnit ?? '');  
+    const [addBarCode, setAddBarCode] = useState(productData?.barcode ?? ''); 
+    const [addLastUpdate, setAddLastUpdate] = useState(productData?.lastUpdated ?? ''); 
+    const [addReorderPoint, setAddReorderPoint] = useState(productData?.reorderPoint ?? '');
+    const [addRestockTime, setAddRestockTime] = useState(productData?.restockTime ?? '');
+    const [addWarrantyInfo, setAddWarrantyInfo] = useState(productData?.warrantyInfo ?? ''); 
+    const [addBatchInfo, setAddBatchInfo] = useState(productData?.batchInfo ?? '');
+    const [addExpireDate, setAddExpireDate] = useState(productData?.expirtDate ?? '');
+    const [addMaterialOrIngredients, setAddMaterialOrIngredients] = useState(productData?.materialOrIngredients ?? ''); 
+    const [addSafetyRating, setAddSafetyRating] = useState(productData?.safetyRating ?? '');
+    const [addShippingRestrictions, setAddShippingRestrictions] = useState(productData?.shippingRestrictions ?? ''); 
     const [addSector, setAddSector] = useState('');  
     const [addNewSetorClicked, setAddNewSetorClicked] = useState(false)
     const [errorAddName, setErrorAddName] = useState('');
@@ -69,6 +103,7 @@ export const AdcProdutos: React.FC = (props) => {
     const [errorAddSafetyRating, setErrorAddSafetyRating] = useState('');
     const [errorAddShippingRestrictions, setErrorAddShippingRestrictions] = useState('');
     const [errorAddSector, setErrorAddSector] = useState('');
+
 
 
     useEffect(() => {
@@ -842,4 +877,4 @@ export const AdcProdutos: React.FC = (props) => {
     )
 }
 
-export default AdcProdutos;
+export default DataProducts;

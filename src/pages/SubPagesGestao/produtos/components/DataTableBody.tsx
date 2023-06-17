@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 type TableData = {
   produto: string;
   vCusto: string;
@@ -9,6 +11,7 @@ type TableData = {
   fornecedor: string;
   setor: string;
   cod: string;
+  token: string;
 }
 
 type DataTableBodyProps = {
@@ -22,7 +25,7 @@ export default function DataTableBody(props: DataTableBodyProps) {
     <tbody>
       {data.map((item, index) => (
         <tr key={index}>
-          <td>{item.produto}</td>
+          <td><Link to={`/axiosadmin/gestao/produtos/descricao/${item.token}`}>{item.produto}</Link></td>
           <td>{item.vCusto}</td>
           <td>{item.vRevenda}</td>
           <td>{item.mDisc}</td>

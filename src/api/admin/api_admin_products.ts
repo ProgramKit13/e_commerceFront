@@ -232,6 +232,30 @@ export const api = {
               return error as ResponseData;
             }
           },
+
+          getProductByToken: async (tokenProduct: string): Promise<ResponseData> => {
+            try {
+              const token = localStorage.getItem('token') || '';
+              const refreshToken = localStorage.getItem('refreshToken') || '';
           
+              const authCheckResponse = await api.AuthCheck(token, refreshToken);
+          
+              if (authCheckResponse.code !== 200) {
+                throw new Error('Invalid token');
+              }
+          
+              let response = await fetch(`http://127.0.0.1:5000/axiosadmin/products/getByToken/${tokenProduct}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              let json = await response.json();
+              return { code: response.status, data: json };
+            } catch (error: any) {
+              return error as ResponseData;
+            }
+          },        
 
 }
