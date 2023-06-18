@@ -75,7 +75,7 @@ export const Produtos  = () => {
     const response = await api.getAndSearchProducts(filters, page);
     const getEnumProduct = await api.getEnumPerPageProducts();
     setEnumProduct(getEnumProduct.data.enumValues);
-    if (response.code === 200) {
+    if (response.code === 200 && response.data) {
       const { products, pagination } = response.data;
       const updatedProductList = products.map(mapProductData);
       setSelectedValue(pagination.per_page);
@@ -87,8 +87,18 @@ export const Produtos  = () => {
         page: pagination.page,
         per_page: pagination.per_page,
       });
-    } else {
-      alert('Produto não encontrado.');
+      setLoading(false);
+    } 
+    if (response.code === 202) {
+      setLoading(false);
+      setProductList([]);
+      setPaginationData({
+        ...paginationData,
+        total: 0,
+        pages: 1,
+        page: 1,
+        per_page: 50,
+      });
     }
     setLoading(false);
   };
@@ -103,7 +113,7 @@ export const Produtos  = () => {
 const handleSearch = async () => {
   const inputElement = document.getElementById('searchProduct') as HTMLInputElement;
   const inputElementSearch = document.getElementById('filterSearch') as HTMLInputElement;
-  if (inputElement && inputElementSearch) {
+  if (inputElement && inputElementSearch && Object.keys(productList).length > 0) {
     const searchValue = inputElement.value;
     const filterField = inputElementSearch.value;
 

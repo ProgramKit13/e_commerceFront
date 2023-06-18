@@ -29,9 +29,9 @@ export const GroupControlsGestao = () => {
         <Col>
           <div className="groupControlGestaoButtons">
             <ControlButton to="produtos" label="Produtos" />
-            <ControlButton to="clientes" label="Clientes" />
-            <ControlButton to="financeiro" label="Financeiro" />
             <ControlButton to="fornecedores" label="Fornecedores" />
+            <ControlButton to="financeiro" label="Financeiro" />
+            <ControlButton to="clientes" label="Clientes" />
           </div>
         </Col>
         <Col>

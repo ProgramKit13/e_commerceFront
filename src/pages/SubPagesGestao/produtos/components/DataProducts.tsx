@@ -2,7 +2,7 @@ import { Card, Container, Row, Form, Col, Button } from "react-bootstrap";
 import { ThemeContext } from "../../../../assets/components/NavBar/controls/controlTheme/SwitchContext";
 import { useContext, forwardRef, useState, useEffect } from "react";
 import { NumericFormat } from 'react-number-format';
-import { getErrorMessage, validateQuantity, validateTextofDescription, valueInput, validateDiferentText, validateBarCode, validateDimensions, valueInputRequired, validateSupplierCode, validateWeight } from "../../../../assets/validators/validator";
+import { getErrorMessage, validateQuantity, validateTextofDescription, validateDiferentText, validateBarCode, validateDimensions, valueInputMask, validateSupplierCode, validateWeight } from "../../../../assets/validators/validator";
 import { api } from "../../../../api/admin/api_admin_products";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from '../../../../redux/store';
@@ -32,7 +32,7 @@ interface ProductData {
   restockTime?: string;
   warrantyInfo?: string;
   batchInfo?: string;
-  expirtDate?: string;
+  expiryDate?: string;
   materialOrIngredients?: string;
   safetyRating?: string;
   shippingRestrictions?: string;
@@ -71,7 +71,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
     const [addRestockTime, setAddRestockTime] = useState(productData?.restockTime ?? '');
     const [addWarrantyInfo, setAddWarrantyInfo] = useState(productData?.warrantyInfo ?? ''); 
     const [addBatchInfo, setAddBatchInfo] = useState(productData?.batchInfo ?? '');
-    const [addExpireDate, setAddExpireDate] = useState(productData?.expirtDate ?? '');
+    const [addExpireDate, setAddExpireDate] = useState(productData?.expiryDate ?? '');
     const [addMaterialOrIngredients, setAddMaterialOrIngredients] = useState(productData?.materialOrIngredients ?? ''); 
     const [addSafetyRating, setAddSafetyRating] = useState(productData?.safetyRating ?? '');
     const [addShippingRestrictions, setAddShippingRestrictions] = useState(productData?.shippingRestrictions ?? ''); 
@@ -105,7 +105,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
     const [errorAddSector, setErrorAddSector] = useState('');
 
 
-
+  
     useEffect(() => {
       dispatch(fetchSelectAllSector());
     }, [dispatch]);
@@ -277,7 +277,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
             const productShippingRestrictions = document.getElementById('productShippingRestrictions') as HTMLInputElement;
 
            
-            const verifyProductName = validateDiferentText(productName.value, true, false);
+            const verifyProductName = validateDiferentText(productName.value, true, false, 3, 100);
             let nameProductError = '';
           
             if (typeof verifyProductName === 'object' && Object.keys(verifyProductName).length > 0) {
@@ -288,7 +288,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
             }
           
           
-            const verifyProductPrice = valueInputRequired(productPrice.value);
+            const verifyProductPrice = valueInputMask(true, productPrice.value);
             let priceProductError = '';
             
             if (typeof verifyProductPrice === 'object' && Object.keys(verifyProductPrice).length > 0) {
@@ -299,7 +299,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
             }
 
 
-            const verifyProductCust = valueInputRequired(productCust.value);
+            const verifyProductCust = valueInputMask(false, productCust.value);
             let costProductError = '';
           
             if (typeof verifyProductCust === 'object' && Object.keys(verifyProductCust).length > 0) {
@@ -311,32 +311,25 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
           
 
             let taxProductError = '';
-            if (addTax !== '') {
-              const verifyProductTax = valueInput(productTax.value);           
-              if (verifyProductTax === false) {
-                taxProductError = 'Valor inválido';
-                setErrorAddTax(taxProductError)
+            const verifyProductTax = valueInputMask(false, productTax.value);           
+            if (typeof verifyProductTax === 'object' && Object.keys(verifyProductTax).length > 0) {
+                  taxProductError = getErrorMessage(verifyProductTax);
+                  setErrorAddTax(taxProductError);
               } else {
                   setErrorAddTax('');
               }
-            } else {
-              setErrorAddTax('');
-            }
+            
                      
           
             
             let discountProductError = '';
-            if (addDiscount !== '') {
-              const verifyProductDiscount = valueInput(productDiscount.value);         
-              if (verifyProductDiscount === false) {
-                  discountProductError = 'Valor inválido';
-                  setErrorAddDiscount(discountProductError)
+              const verifyProductDiscount = valueInputMask(false, productDiscount.value);         
+              if (typeof verifyProductDiscount === 'object' && Object.keys(verifyProductDiscount).length > 0) {
+                  discountProductError = getErrorMessage(verifyProductDiscount);
+                  setErrorAddDiscount(discountProductError);
               } else {
                   setErrorAddDiscount('');
               }
-            } else {
-              setErrorAddDiscount('');
-            }
 
 
             let supplierCodeError = '';
@@ -367,7 +360,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
             let supplierProductError = '';
             if (addSupplier !== '') { 
-              const verifyProductSupplier = validateDiferentText(addSupplier, false, true);
+              const verifyProductSupplier = validateDiferentText(addSupplier, false, false, 3, 100);
               if (typeof verifyProductSupplier === 'object' && Object.keys(verifyProductSupplier).length > 0) {
                 supplierProductError = getErrorMessage(verifyProductSupplier);
                 setErrorAddSupplier(supplierProductError)
@@ -380,7 +373,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
 
         
-            const verifyProductSector = validateDiferentText(productSectorSelect.value, true, true);
+            const verifyProductSector = validateDiferentText(productSectorSelect.value, false, false, 3, 100);
             let supplierSectortError = '';         
             if (typeof verifyProductSector === 'object' && Object.keys(verifyProductSector).length > 0) {
               supplierSectortError = getErrorMessage(verifyProductSector);
@@ -406,7 +399,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
             
             let manufacturerProductError = '';
             if (addManufacturer !== '') {
-              const verifyProductManufacturer = validateDiferentText(productManufacturer.value, false, false);
+              const verifyProductManufacturer = validateDiferentText(productManufacturer.value, false, false, 3, 100);
               if (typeof verifyProductManufacturer === 'object' && Object.keys(verifyProductManufacturer).length > 0) {
                   manufacturerProductError = getErrorMessage(verifyProductManufacturer);
                   setErrorAddManufacturer(manufacturerProductError)
@@ -492,7 +485,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
             let warrantyInfoProductError = '';
             if (addWarrantyInfo !== '') {
-              const verifyProductWarrantyInfo = validateDiferentText(productWarrantyInfo.value, false, true);
+              const verifyProductWarrantyInfo = validateDiferentText(productWarrantyInfo.value, false, false, 3, 100);
               if (typeof verifyProductWarrantyInfo === 'object' && Object.keys(verifyProductWarrantyInfo).length > 0) {
                   warrantyInfoProductError = getErrorMessage(verifyProductWarrantyInfo);
                   setErrorAddWarrantyInfo(warrantyInfoProductError)
@@ -507,7 +500,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
             let batchInfoProductError = '';
               if (addBatchInfo !== '') {
-              const verifyProductBatchInfo = validateDiferentText(productBatchInfo.value, false, true);
+              const verifyProductBatchInfo = validateDiferentText(productBatchInfo.value, false, false, 3, 100);
               if (typeof verifyProductBatchInfo === 'object' && Object.keys(verifyProductBatchInfo).length > 0) {
                   batchInfoProductError = getErrorMessage(verifyProductBatchInfo);
                   setErrorAddBatchInfo(batchInfoProductError)
@@ -522,7 +515,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
             let materialOrIngredientsProductError = '';
             if (addMaterialOrIngredients !== '') {
-              const verifyMaterialOrIngredients = validateDiferentText(productMaterialOrIngredients.value, false, false);
+              const verifyMaterialOrIngredients = validateDiferentText(productMaterialOrIngredients.value, false, false, 3, 100);
 
               if (typeof verifyMaterialOrIngredients === 'object' && Object.keys(verifyMaterialOrIngredients).length > 0) {
                   materialOrIngredientsProductError = getErrorMessage(verifyMaterialOrIngredients);
@@ -537,7 +530,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
             let safetyRatingProductError = '';
             if (addSafetyRating !== '') {
-              const verifyProductSafetyRating = validateDiferentText(productSafetyRating.value, false, false);
+              const verifyProductSafetyRating = validateDiferentText(productSafetyRating.value, false, false, 3, 100);
 
               if (typeof verifyProductSafetyRating === 'object' && Object.keys(verifyProductSafetyRating).length > 0) {
                   safetyRatingProductError = getErrorMessage(verifyProductSafetyRating);
@@ -553,7 +546,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
 
             let shippingRestrictionsProductError = '';
             if (addShippingRestrictions !== '') {
-              const verifyProductShippingRestrictions = validateDiferentText(productShippingRestrictions.value, false, false);
+              const verifyProductShippingRestrictions = validateDiferentText(productShippingRestrictions.value, false, false, 3, 100);
 
               if (typeof verifyProductShippingRestrictions === 'object' && Object.keys(verifyProductShippingRestrictions).length > 0) {
                   shippingRestrictionsProductError = getErrorMessage(verifyProductShippingRestrictions);
@@ -596,16 +589,27 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
                 safetyRating: productSafetyRating.value,
                 shippingRestrictions: productShippingRestrictions.value,
               };
-              let response = await api.registerProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase, product.sector, product.supplierCode, product.manufacturer, product.weight, product.weightUnit, product.dimensions, product.dimensionsUnit, product.barCode, product.lastUpdate, product.reorderPoint, product.restockTime, product.warrantyInfo, product.batchInfo, product.expireDate, product.materialOrIngredients, product.safetyRating, product.shippingRestrictions);
-              if (response.code === 200 || response.code === 201) {
-                alert('Produto cadastrado com sucesso!');
-                
-              } else {
-                alert('Erro ao cadastrar o produto produtos.');
-              }
-            } else {
-              alert('Erro ao cadastrar o produto produtos.');
-            }
+
+                if (productData !== undefined && Object.keys(productData).length > 0) {
+                    let response = await api.updateProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase, product.sector, product.supplierCode, product.manufacturer, product.weight, product.weightUnit, product.dimensions, product.dimensionsUnit, product.barCode, product.lastUpdate, product.reorderPoint, product.restockTime, product.warrantyInfo, product.batchInfo, product.expireDate, product.materialOrIngredients, product.safetyRating, product.shippingRestrictions, productData.token);
+                    if (response.code === 200 || response.code === 201) {
+                      alert('Produto atualizado com sucesso!');                      
+                    }
+                    else {
+                      alert('Erro ao atualizar o produto.');
+                    }
+                } else {
+                  let response = await api.registerProduct(product.prodName, product.valueResale, product.cust, product.tax, product.supplier, product.discount, product.description, product.qt, product.datePurchase, product.sector, product.supplierCode, product.manufacturer, product.weight, product.weightUnit, product.dimensions, product.dimensionsUnit, product.barCode, product.lastUpdate, product.reorderPoint, product.restockTime, product.warrantyInfo, product.batchInfo, product.expireDate, product.materialOrIngredients, product.safetyRating, product.shippingRestrictions);
+                    if (response.code === 200 || response.code === 201) {
+                      alert('Produto cadastrado com sucesso!');
+                      
+                    } else {
+                      alert('Erro ao cadastrar o produto produtos.');
+                    }
+                  }
+                  } else {
+                    alert('Erro ao cadastrar o produto produtos.');
+                  }           
           };
   
 
@@ -644,7 +648,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
                             <Col lg={2}>
                               <Form.Group controlId="productCust">
                                 <Form.Label>Valor de compra</Form.Label>
-                                <NumericFormat thousandSeparator={'.'} decimalSeparator={','} decimalScale={2} fixedDecimalScale={true} prefix={'R$ '} required value={addCust} onChange={handleAddCust} customInput={CustomInput}/>
+                                <NumericFormat thousandSeparator={'.'} decimalSeparator={','} decimalScale={2} fixedDecimalScale={true} prefix={'R$ '} value={addCust} onChange={handleAddCust} customInput={CustomInput}/>
                                 <p className="errorInfo">{errorAddCust}</p>
                               </Form.Group>
                             </Col>
@@ -724,7 +728,7 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
                             <Col lg={3}>
                               <Form.Group controlId="productDatePurchase">
                                 <Form.Label>Data da compra</Form.Label>
-                                <Form.Control type="date" required value={addDatePurchase} onChange={handleAddDatePurchase} />
+                                <Form.Control type="date" value={addDatePurchase} onChange={handleAddDatePurchase} />
                               </Form.Group>
                             </Col>
                             <Col lg={2}>
@@ -860,13 +864,17 @@ export const DataProducts: React.FC<DataProductsProps> = ({productData}) => {
                                 </Form.Group>
                                 </Col>
                             </Row>
-                            <Row className="mt-3">
-                                <Col>
-                                    <Button variant="primary" onClick={handleSave}>
-                                        Adicionar
-                                    </Button>
-                                </Col>
-                            </Row>
+                              <Row className="mt-3">
+                                  <Col>
+                                      <Button variant="primary" onClick={handleSave}>
+                                      {productData !== undefined && Object.keys(productData).length > 0 ? (
+                                          "Salvar"
+                                      ) : (
+                                          "Adicionar"
+                                      )}
+                                      </Button>
+                                  </Col>
+                              </Row>
                             </Form>
                         </Card.Body>
                     </Card>

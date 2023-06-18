@@ -1,54 +1,43 @@
-export const validateDiferentText = (text: string, required:boolean, pureText: boolean) => {
+export const validateDiferentText = (text: string, required: boolean, pureText: boolean, min: number, max: number) => {
     let verify = true;
     const msgm: { [key: string]: string } = {};
 
     if (text === '' && required) {
         verify = false;
-        msgm['empty'] = 'O campo não pode ser vazio.';
+        msgm['empty'] = 'Campo não pode ser vazio.';
     }
 
-    if ((text !== '') && (text.length < 3 || text.length > 100)) {
-        verify = false;
-        msgm['amount'] = 'O campo não pode ter menos de 3 caracteres ou mais de 100.';
-    } else if (text[0] === ' ' || text[text.length - 1] === ' ') {
-        verify = false;
-        msgm['spaces'] = 'Espaços inválidos.';
-    }
+    if (text !== '') {
+        if (text.length < min || text.length > max) {
+            verify = false;
+            msgm['amount'] = `Campo de ter entre ${min} e ${max} caracteres.`;
+        }
 
-    if (
-        text !== '' &&
-        (text.includes('SELECT') ||
-        text.includes('UPDATE') ||
-        text.includes('DELETE') ||
-        text.includes('INSERT'))
-    ) {
-        verify = false;
-        msgm['bad_intention'] = 'Tentativa de injeção de SQL.';
-    }
+        if (text[0] === ' ' || text[text.length - 1] === ' ') {
+            verify = false;
+            msgm['spaces'] = 'Espaço inválido.';
+        }
 
-    if (text !== '' && pureText) {
+        if (text.includes('SELECT') || text.includes('UPDATE') || text.includes('DELETE') || text.includes('INSERT')) {
+            verify = false;
+            msgm['bad_intention'] = 'Tentativa de injeção de SQL.';
+        }
+
+        const allowedChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúàèìòùâêîôûãõçÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ01234567890 !@#$%^&*()';
+        const pureTextChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúàèìòùâêîôûãõçÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ0';
+
         for (const char of text) {
-            if (
-                char.toLowerCase() !== char.toUpperCase() &&
-                !'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúàèìòùâêîôûãõçÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ0123456789 '.includes(char)
-            ) {
+            if ((pureText && !pureTextChars.includes(char)) || (!pureText && !allowedChars.includes(char))) {
                 verify = false;
-                msgm['char'] = 'Campo contém caracteres inválidos.';
+                msgm['char'] = 'O campo contem caracter inválido.';
                 break;
             }
         }
     }
 
-    if (verify === true) {
-        text = text.toLowerCase().split(' ').map(word => !isNaN(parseFloat(word.charAt(0))) ? word : word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
-    }
-
-    if (verify === false) {
-        return msgm;
-    } else {
-        return text;
-    }
+    return verify ? true : msgm;
 };
+
 
 export const validateWeight = (weight: string) => {
     let verify = true;
@@ -73,25 +62,17 @@ export const validateWeight = (weight: string) => {
     }
   };
 
-export const valueInput = (value: string): boolean => {
-    const normalizedValue = value.replace('R$', '').replace('.', '').replace(',', '.').replace('%', '');
-    const numberValue = Number(normalizedValue);
-    if (isNaN(numberValue) || numberValue < 0) {
-      return false;
-    }
-  
-    return true;
-};
 
-
-export const valueInputRequired = (value: string) => {
+export const valueInputMask = (required: boolean, value: string) => {
     let verify = true;
     const msgm: { [key: string]: string } = {};
 
-    if (value === '') {
+    if (value === '' && required) {
         verify = false;
         msgm['empty'] = 'O campo não pode ser vazio.';
-    } else {
+    } 
+    
+    if (value !== '') {
         const normalizedValue = value.replace('R$', '').replace('.', '').replace(',', '.').replace('%', '');
         const numberValue = Number(normalizedValue);
         if (isNaN(numberValue) || numberValue < 0) {
@@ -99,7 +80,6 @@ export const valueInputRequired = (value: string) => {
             msgm['format'] = 'O campo precisa ser um número positivo.';
         }
     }
-
     if (verify === false) {
         return msgm;
     } else {
