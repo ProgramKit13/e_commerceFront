@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"
-import { api } from "../../../../api/admin/api_admin_products";
+import { api } from "../../../../api/admin/api_admin_management";
 import { NotFound } from "../../../NotFound";
 import { DataProducts } from "./DataProducts";
 

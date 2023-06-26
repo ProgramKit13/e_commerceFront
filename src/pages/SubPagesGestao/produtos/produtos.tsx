@@ -1,7 +1,7 @@
 import { Container, Row, Col, Card, Table, Form, Button, Pagination } from 'react-bootstrap';
 import DataTableBody from './components/DataTableBody';
 import { MdAddCircle } from 'react-icons/md';
-import { api } from '../../../api/admin/api_admin_products';
+import { api } from '../../../api/admin/api_admin_management';
 import { useInterceptResponseFormContext  } from '../../../assets/components/Gestao/interceptResponseForm';
 import { useContext, useEffect, useState, ChangeEvent, forwardRef } from 'react';
 import './css/styles.css';
@@ -12,7 +12,8 @@ import {  Link } from 'react-router-dom';
 import { NumericFormat } from "react-number-format";
 
 const CustomInput = forwardRef((props, ref) => <Form.Control {...props}  />);
-
+const proprietyEnum = 'productsPerPage';
+const urlLocation = 'produtos'
 interface Product {
   token: string;
   prodName: string;
@@ -72,12 +73,12 @@ export const Produtos  = () => {
 
   const fetchData = async (filters?: { [key: string]: any }, page: number = paginationData.page) => {
     setLoading(true);
-    const response = await api.getAndSearchProducts(filters, page);
-    const getEnumProduct = await api.getEnumPerPageProducts();
-    setEnumProduct(getEnumProduct.data.enumValues);
-    if (response.code === 200 && response.data) {
-      const { products, pagination } = response.data;
-      const updatedProductList = products.map(mapProductData);
+    const response = await api.getAndSearch(filters, page, urlLocation);
+    const getEnumProduct = await api.getEnumPerPage(proprietyEnum);
+    setEnumProduct(getEnumProduct.data);
+    if (response.code === 200 && response.data.listData !== undefined) {
+      const { listData, pagination } = response.data;
+      const updatedProductList = listData.map(mapProductData);
       setSelectedValue(pagination.per_page);
       setProductList(updatedProductList);
       setPaginationData({
@@ -89,17 +90,16 @@ export const Produtos  = () => {
       });
       setLoading(false);
     } 
-    if (response.code === 202) {
+    
+    else if (response.code == 200 && response.data.listData == undefined) {
       setLoading(false);
-      setProductList([]);
-      setPaginationData({
-        ...paginationData,
-        total: 0,
-        pages: 1,
-        page: 1,
-        per_page: 50,
-      });
     }
+
+    else {
+      alert('Erro ao carregar produtos!');
+      setLoading(false);
+    }
+
     setLoading(false);
   };
 
@@ -108,7 +108,6 @@ export const Produtos  = () => {
   const parsedValue = numericValue.replace(',', '.'); // Substituir vírgulas por pontos para formatar corretamente o número
   return parseFloat(parsedValue);
 };
-
 
 const handleSearch = async () => {
   const inputElement = document.getElementById('searchProduct') as HTMLInputElement;
@@ -120,7 +119,7 @@ const handleSearch = async () => {
     const filters: { [key: string]: string | number} = {
       [filterField]: searchValue,
     };
-
+  
     if (getCust !== '') {
       filters.cust = formatNumber(getCust);
     }
@@ -181,7 +180,7 @@ const handleClearSearch = async () => {
 
 const handleQtProd = async (event: ChangeEvent<HTMLSelectElement>) => {
     const selectEnumListProd = parseInt(event.target.value);
-    const updateQtPerPage = await api.updatePerPageProductsEnum(selectEnumListProd);
+    const updateQtPerPage = await api.updatePerPage(proprietyEnum, selectEnumListProd);
     if (updateQtPerPage.code === 200) {
       setPaginationData(prevState => ({
         ...prevState, 
@@ -314,19 +313,19 @@ const handleQtProd = async (event: ChangeEvent<HTMLSelectElement>) => {
                     <Form.Group className="mb-3" controlId="formFilterSearch">
                         <Form.Label>Filtro de busca</Form.Label>
                         <Form.Select aria-label="Filtro de busca" id='filterSearch' defaultValue="nome">
-                          <option value="nome">Nome</option>
-                          <option value="barcode">Cod. Barras</option>
-                          <option value="fornecedor">Fornecedor</option>
-                          <option value="setor">Categoria</option>
-                          <option value="descricao">Descrição</option>
-                          <option value="fabricante">Fabricante</option>
+                          <option value="produto_nome">Nome</option>
+                          <option value="produto_barcode">Cod. Barras</option>
+                          <option value="produto_fornecedor">Fornecedor</option>
+                          <option value="produto_setor">Categoria</option>
+                          <option value="produto_descricao">Descrição</option>
+                          <option value="produto_fabricante">Fabricante</option>
                         </Form.Select>
                     </Form.Group>
                     </Col>
                     <Col lg={5}>
                         <Form.Label>Buscar</Form.Label>
                         <InputGroup>
-                          <Form.Control type="text" placeholder="Procurar por produto" aria-describedby="buttonSearch" id='searchProduct'/>
+                          <Form.Control type="text" placeholder="Procurar por produto" id='searchProduct'/>
                         </InputGroup>
                     </Col>
                   <Col lg={2} className='formQtList'>

@@ -3,7 +3,7 @@ import { ThemeContext } from "../../../../assets/components/NavBar/controls/cont
 import { useContext, forwardRef, useState, useEffect } from "react";
 import { NumericFormat } from 'react-number-format';
 import { getErrorMessage, validateQuantity, validateTextofDescription, validateDiferentText, validateBarCode, validateDimensions, valueInputMask, validateSupplierCode, validateWeight } from "../../../../assets/validators/validator";
-import { api } from "../../../../api/admin/api_admin_products";
+import { api } from "../../../../api/admin/api_admin_management";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from '../../../../redux/store';
 import { fetchSelectAllSector } from "../../../../redux/reducers/sectorsReducer";

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {api} from '../../api/admin/api_admin_products';
+import {api} from '../../api/admin/api_admin_management';
 
 export const fetchSelectAllSector = createAsyncThunk(
     "sectors/fetchSelectAllSector",

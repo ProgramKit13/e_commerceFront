@@ -6,6 +6,8 @@ type ResponseData = {
 
 
 export const api = {
+
+          /*##########INITIAL GLOBAL API GESTAO##########*/
           AuthCheck: async (token: string, refreshToken: string): Promise<ResponseData> => {
             try {
               const response = await fetch('http://127.0.0.1:5000/protected', 
@@ -48,6 +50,116 @@ export const api = {
 
 
 
+
+          updatePerPage: async (attribute_name: string, perPage: number): Promise<ResponseData> => {
+            try {
+              const token = localStorage.getItem('token') || '';
+              const refreshToken = localStorage.getItem('refreshToken') || '';
+          
+              const authCheckResponse = await api.AuthCheck(token, refreshToken);
+          
+              if (authCheckResponse.code !== 200) {
+                throw new Error('Invalid token');
+              }
+          
+              let response = await fetch('http://127.0.0.1:5000/axiosadmin/adminPreferences/updatePerPage', {
+                method: 'PUT',
+                body: JSON.stringify({
+                  new_value: perPage,
+                  attribute_name: attribute_name
+                }),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+
+              let json = await response.json();
+              return { code: response.status, data: json };
+            } catch (error: any) {
+              return error as ResponseData;
+            }
+          },
+
+
+          getAndSearch: async (filters: Record<string, string> = {}, page: number = 1, urlLocation: string): Promise<ResponseData> => {
+            try {
+              const token = localStorage.getItem('token') || '';
+              const refreshToken = localStorage.getItem('refreshToken') || '';
+          
+              const authCheckResponse = await api.AuthCheck(token, refreshToken);
+          
+              if (authCheckResponse.code !== 200) {
+                throw new Error('Invalid token');
+              }
+          
+              let queryParams = new URLSearchParams();
+              if (Object.keys(filters).length > 0) {
+                queryParams = new URLSearchParams(filters);
+              }
+              queryParams.append("page", page.toString());
+              let url = `http://127.0.0.1:5000/axiosadmin/gestao/${urlLocation}?${queryParams}`;
+          
+              let response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+          
+              let json = await response.json();
+              let listData = json.list;
+              let paginationInfo = {
+                total: json.total,
+                pages: json.pages,
+                page: json.page,
+                per_page: json.per_page
+              };
+          
+              return { code: response.status, data: {listData: listData, pagination: paginationInfo}};
+            } catch (error: any) {
+              return error as ResponseData;
+            }
+          },
+
+
+
+          getEnumPerPage: async (attribute_name: string): Promise<ResponseData> => {
+            try {
+              const token = localStorage.getItem('token') || '';
+              const refreshToken = localStorage.getItem('refreshToken') || '';
+          
+              const authCheckResponse = await api.AuthCheck(token, refreshToken);
+          
+              if (authCheckResponse.code !== 200) {
+                throw new Error('Invalid token');
+              }
+          
+              let response = await fetch('http://127.0.0.1:5000/axiosadmin/adminPreferences/selectPerPage', {
+                method: 'POST',
+                body: JSON.stringify({
+                  attribute_name: attribute_name
+                }),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+
+              let json = await response.json();
+              return { code: response.status, data: json };
+            } catch (error: any) {
+              return error as ResponseData;
+            }
+          },
+          /*##########END GLOBAL API##########*/
+
+
+
+
+
+          /*##########INITIAL API PRODUCTS##########*/
           registerProduct: async (
             prodName: string, valueResale: number, cust: number, tax: number = 0, supplier: string = '', discount: number = 0, description: string = '', qt: number = 0, datePurchase: Date | string, sector: string = '', 
             supplierCode: string = '', manufacturer: string = '', weight: number = 0, weightUnit: string = '', dimensions: string = '', dimensionsUnit: string = '', barCode: string = '', lastUpdate:  Date | string | null = null, 
@@ -105,80 +217,7 @@ export const api = {
               return error as ResponseData;
             }
           },
-          
-
-       
-          updatePerPageProductsEnum: async (perPage: number): Promise<ResponseData> => {
-            try {
-              const token = localStorage.getItem('token') || '';
-              const refreshToken = localStorage.getItem('refreshToken') || '';
-          
-              const authCheckResponse = await api.AuthCheck(token, refreshToken);
-          
-              if (authCheckResponse.code !== 200) {
-                throw new Error('Invalid token');
-              }
-          
-              let response = await fetch('http://127.0.0.1:5000/axiosadmin/adminPreferences/updatePerPage', {
-                method: 'PUT',
-                body: JSON.stringify({
-                  new_value: perPage
-                }),
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-
-              let json = await response.json();
-              return { code: response.status, data: json };
-            } catch (error: any) {
-              return error as ResponseData;
-            }
-          },
-
-          getAndSearchProducts: async (filters: Record<string, string> = {}, page: number = 1): Promise<ResponseData> => {
-            try {
-              const token = localStorage.getItem('token') || '';
-              const refreshToken = localStorage.getItem('refreshToken') || '';
-          
-              const authCheckResponse = await api.AuthCheck(token, refreshToken);
-          
-              if (authCheckResponse.code !== 200) {
-                throw new Error('Invalid token');
-              }
-          
-              let queryParams = new URLSearchParams();
-              if (Object.keys(filters).length > 0) {
-                queryParams = new URLSearchParams(filters);
-              }
-              queryParams.append("page", page.toString());
-              let url = `http://127.0.0.1:5000/axiosadmin/gestao/produtos?${queryParams}`;
-          
-              let response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-          
-              let json = await response.json();
-          
-              let products = json.list;
-              let paginationInfo = {
-                total: json.total,
-                pages: json.pages,
-                page: json.page,
-                per_page: json.per_page
-              };
-          
-              return { code: response.status, data: {products: products, pagination: paginationInfo}};
-            } catch (error: any) {
-              return error as ResponseData;
-            }
-          },
-          
+                
 
 
           getAllSectots : async (): Promise<ResponseData> => {
@@ -207,31 +246,6 @@ export const api = {
             }
           },
 
-          getEnumPerPageProducts: async (): Promise<ResponseData> => {
-            try {
-              const token = localStorage.getItem('token') || '';
-              const refreshToken = localStorage.getItem('refreshToken') || '';
-          
-              const authCheckResponse = await api.AuthCheck(token, refreshToken);
-          
-              if (authCheckResponse.code !== 200) {
-                throw new Error('Invalid token');
-              }
-          
-              let response = await fetch('http://127.0.0.1:5000/axiosadmin/adminPreferences/selectPerPage', {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-
-              let json = await response.json();
-              return { code: response.status, data: json };
-            } catch (error: any) {
-              return error as ResponseData;
-            }
-          },
 
           getProductByToken: async (tokenProduct: string): Promise<ResponseData> => {
             try {
@@ -314,8 +328,7 @@ export const api = {
               return error as ResponseData;
             }
           },
-
-
+          /*##########INITIAL END PRODUCTS##########*/
 
 
 }
